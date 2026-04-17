@@ -38,6 +38,20 @@ class FirebaseService {
         });
     }
 
+    esperarUsuario() {
+        return new Promise((resolve) => {
+            if (this.currentUser) {
+                resolve(this.currentUser);
+            } else {
+                const unsubscribe = onAuthStateChanged(this.auth, (user) => {
+                    unsubscribe();
+                    this.currentUser = user;
+                    resolve(user);
+                });
+            }
+        });
+    }
+
     async iniciarSesionConGithub() {
         return signInWithPopup(this.auth, this.githubProvider);
     }
@@ -74,6 +88,7 @@ class FirebaseService {
     }
 
     async crearSala(salaId, nombreJugador) {
+        await this.esperarUsuario();
         if (!this.currentUser) throw new Error("You are not logged in.");
         this.salaId = salaId;
         this.salaRef = ref(this.db, `rooms/${this.salaId}`);
@@ -85,7 +100,7 @@ class FirebaseService {
         
         this.miRol = 'jugador1';
         await set(this.salaRef, {
-            ultimaActividad: Date.now(),
+            ultimaActividad: serverTimestamp(),
             jugador1: { uid: this.currentUser.uid, nombre: nombreJugador },
             estado: {
                 tablero1: [[], [], []],
@@ -97,6 +112,7 @@ class FirebaseService {
     }
 
     async unirseASala(salaId, nombreJugador) {
+        await this.esperarUsuario();
         if (!this.currentUser) throw new Error("You are not logged in.");
         this.salaId = salaId;
         this.salaRef = ref(this.db, `rooms/${this.salaId}`);
@@ -131,6 +147,7 @@ class FirebaseService {
     }
 
     async enviarDado(valorDado) {
+        await this.esperarUsuario();
         if (!this.salaId) return;
         return update(ref(this.db, `rooms/${this.salaId}`), {
             "estado/dadoActual": valorDado,
@@ -139,6 +156,7 @@ class FirebaseService {
     }
 
     async enviarMovimiento(tableroLocalMutado, tableroOponenteMutado, nuevoTurno) {
+        await this.esperarUsuario();
         if (!this.salaId || !this.miRol) return;
         
         let keyJugador = this.miRol === 'jugador1' ? 'tablero1' : 'tablero2';
