@@ -379,6 +379,8 @@ redFirebase.observarEstadoSesion((user) => {
         topNav.classList.remove('hidden');
         lobbyOverlay.classList.remove('hidden');
         gameWrapper.classList.add('hidden');
+        
+        redFirebase.limpiarSalasInactivas();
     } else {
         loginOverlay.classList.remove('hidden');
         topNav.classList.add('hidden');
