@@ -27,7 +27,7 @@ jobs:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🔐 Inyectar Variables de Firebase
+      - name: 🔐 Firebase Configuration
         run: |
           sed -i "s|FIREBASE_API_KEY|${{ secrets.FIREBASE_API_KEY }}|g" src/js/FirebaseService.js
           sed -i "s|FIREBASE_AUTHDOMAIN|${{ secrets.FIREBASE_AUTHDOMAIN }}|g" src/js/FirebaseService.js
