@@ -24,6 +24,7 @@ const lobbyOverlay = document.getElementById('lobby-overlay');
 const topNav = document.getElementById('top-nav');
 const loggedUserName = document.getElementById('logged-user-name');
 const logoutBtn = document.getElementById('logout-btn');
+const leaveBtn = document.getElementById('leave-btn');
 const roomInput = document.getElementById('room-input');
 const createRoomBtn = document.getElementById('create-room-btn');
 const joinRoomBtn = document.getElementById('join-room-btn');
@@ -226,7 +227,32 @@ function mostrarModalFinal() {
     modalOverlay.classList.remove('hidden');
 }
 
+async function salirAlLobby() {
+    await redFirebase.abandonarSala();
+    gameWrapper.classList.add('hidden');
+    lobbyOverlay.classList.remove('hidden');
+    leaveBtn.classList.add('hidden');
+    
+    currentDataSala = null;
+    turnoActual = 'jugador1';
+    game.dadoActual = 0;
+    game.tableroJugador = [[], [], []];
+    game.tableroOponente = [[], [], []];
+    renderTableros();
+    actualizarPuntos();
+    modalOverlay.classList.add('hidden');
+}
+
+leaveBtn.addEventListener('click', async () => {
+    await salirAlLobby();
+});
+
 function reaccionarCambioServidor(dataSala, miRol) {
+    if (!dataSala) {
+        alert(t('roomClosedMessage'));
+        salirAlLobby();
+        return;
+    }
     currentDataSala = dataSala;
     const estado = dataSala.estado;
     if(!estado) return;
@@ -320,6 +346,9 @@ loginGoogleBtn.addEventListener('click', async () => {
 
 logoutBtn.addEventListener('click', async () => {
     try {
+        if (!gameWrapper.classList.contains('hidden')) {
+            await redFirebase.abandonarSala();
+        }
         await redFirebase.cerrarSesion();
         window.location.reload();
     } catch(e) {
@@ -339,6 +368,7 @@ createRoomBtn.addEventListener('click', async () => {
         createRoomBtn.innerHTML = `<span class="roll-btn-text">${t('createRoom')}</span><span class="roll-btn-shine"></span>`;
         lobbyOverlay.classList.add('hidden');
         gameWrapper.classList.remove('hidden');
+        leaveBtn.classList.remove('hidden');
         
         redFirebase.escucharCambiosSala(reaccionarCambioServidor);
     } catch (error) {
@@ -360,6 +390,7 @@ joinRoomBtn.addEventListener('click', async () => {
         joinRoomBtn.innerHTML = `<span class="roll-btn-text">${t('joinRoom')}</span><span class="roll-btn-shine"></span>`;
         lobbyOverlay.classList.add('hidden');
         gameWrapper.classList.remove('hidden');
+        leaveBtn.classList.remove('hidden');
         
         redFirebase.escucharCambiosSala(reaccionarCambioServidor);
     } catch (error) {

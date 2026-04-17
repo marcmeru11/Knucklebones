@@ -139,10 +139,26 @@ class FirebaseService {
 
     escucharCambiosSala(callback) {
         if (!this.salaRef) return;
-        onValue(this.salaRef, (snapshot) => {
-            if (!snapshot.exists()) return;
+        this.unsubscribeSala = onValue(this.salaRef, (snapshot) => {
+            if (!snapshot.exists()) {
+                callback(null, this.miRol);
+                return;
+            }
             callback(snapshot.val(), this.miRol);
         });
+    }
+
+    async abandonarSala() {
+        if (this.unsubscribeSala) {
+            this.unsubscribeSala();
+            this.unsubscribeSala = null;
+        }
+        if (this.salaId) {
+            await remove(ref(this.db, `rooms/${this.salaId}`));
+        }
+        this.salaId = null;
+        this.salaRef = null;
+        this.miRol = null;
     }
 
     async enviarDado(valorDado) {

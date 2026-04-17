@@ -36,7 +36,9 @@ const translations = {
         errorLogin: "An error occurred.",
         errorFirebase: "Firebase Error: ",
         waitingRival: "Waiting for opponent...",
-        host: "Host"
+        host: "Host",
+        leaveRoom: "Leave Match",
+        roomClosedMessage: "The match was closed because a player left."
     },
     es: {
         pageTitle: "Matatena",
@@ -75,7 +77,9 @@ const translations = {
         errorLogin: "Ocurrió un error.",
         errorFirebase: "Error de Firebase: ",
         waitingRival: "Esperando rival...",
-        host: "Host"
+        host: "Host",
+        leaveRoom: "Salir de Partida",
+        roomClosedMessage: "La partida se cerró porque un jugador se retiró."
     }
 };
 
