@@ -1,4 +1,5 @@
 import { redFirebase } from './FirebaseService.js';
+import { setLanguage, t } from './i18n.js';
 
 const game = new MatatenaLogic();
 let turnoActual = 'jugador1';
@@ -16,7 +17,6 @@ const winnerTitle = document.getElementById('winner-title');
 const winnerScoreText = document.getElementById('winner-score');
 const restartBtn = document.getElementById('restart-btn');
 
-const loginOverlay = document.getElementById('login-overlay');
 const loginGithubBtn = document.getElementById('login-github-btn');
 const loginGoogleBtn = document.getElementById('login-google-btn');
 const lobbyOverlay = document.getElementById('lobby-overlay');
@@ -29,6 +29,43 @@ const joinRoomBtn = document.getElementById('join-room-btn');
 const gameWrapper = document.getElementById('game-wrapper');
 const playerNameDisplay = document.getElementById('player-name-display');
 const opponentNameDisplay = document.querySelector('.opponent-zone .player-name');
+
+const langEnBtn = document.getElementById('lang-en');
+const langEsBtn = document.getElementById('lang-es');
+
+let currentDataSala = null;
+
+// --- IDIOMAS ---
+setLanguage('en'); // Init 
+
+langEnBtn.addEventListener('click', () => {
+    langEnBtn.classList.add('active');
+    langEsBtn.classList.remove('active');
+    setLanguage('en');
+});
+
+langEsBtn.addEventListener('click', () => {
+    langEsBtn.classList.add('active');
+    langEnBtn.classList.remove('active');
+    setLanguage('es');
+});
+
+window.addEventListener('languageChanged', () => {
+    if (currentDataSala && redFirebase.getRol()) {
+        // Re-render UI text depending on state
+        actualizarIndicadorTurno(currentDataSala, redFirebase.getRol());
+        if (checkGameOver() && !modalOverlay.classList.contains('hidden')) {
+            mostrarModalFinal();
+        }
+        
+        // Re-render Opponent name if waiting
+        if (redFirebase.getRol() === 'jugador1') {
+            opponentNameDisplay.textContent = currentDataSala.jugador2 ? currentDataSala.jugador2.nombre : t('waitingRival');
+        } else {
+            opponentNameDisplay.textContent = currentDataSala.jugador1 ? currentDataSala.jugador1.nombre : t('host');
+        }
+    }
+});
 
 function getDiceSVG(valor) {
     if (!valor || valor < 1 || valor > 6) return '';
@@ -144,8 +181,8 @@ function actualizarIndicadorTurno(dataSala, miRol) {
     
     const faltaRival = !dataSala.jugador1 || !dataSala.jugador2;
     if (faltaRival) {
-        hintText.innerHTML = `Estado: <strong style="color: var(--clr-text-muted)">Esperando rival...</strong>`;
-        document.querySelector('.roll-btn-text').textContent = `Esperando...`;
+        hintText.innerHTML = `<strong style="color: var(--clr-text-muted)">${t('statusWaiting')}</strong>`;
+        document.querySelector('.roll-btn-text').textContent = t('rollWaiting');
         return;
     }
     
@@ -153,12 +190,12 @@ function actualizarIndicadorTurno(dataSala, miRol) {
     const nombreJ2 = dataSala.jugador2 ? dataSala.jugador2.nombre.split(' ')[0] : 'J2';
 
     if (turnoServer === miRol) {
-        hintText.innerHTML = `Turno: <strong style="color: var(--clr-player)">TÚ</strong>`;
-        document.querySelector('.roll-btn-text').textContent = `🎲 Lanzar (TÚ)`;
+        hintText.innerHTML = `<strong style="color: var(--clr-player)">${t('turnYou')}</strong>`;
+        document.querySelector('.roll-btn-text').textContent = t('rollYou');
     } else {
         const nombreRival = miRol === 'jugador1' ? nombreJ2 : nombreJ1;
-        hintText.innerHTML = `Turno: <strong style="color: #d45b5b">${nombreRival.toUpperCase()}</strong>`;
-        document.querySelector('.roll-btn-text').textContent = `Espera...`;
+        hintText.innerHTML = `${t('turnOpponent')}<strong style="color: #d45b5b">${nombreRival.toUpperCase()}</strong>`;
+        document.querySelector('.roll-btn-text').textContent = t('rollWait');
     }
 }
 
@@ -177,11 +214,11 @@ function mostrarModalFinal() {
     
     winnerTitle.className = 'winner-title';
     if (ptosTotalesJugador > ptosTotalesOponente) {
-        winnerTitle.textContent = '¡Victoria!'; winnerTitle.classList.add('win');
+        winnerTitle.textContent = t('victory'); winnerTitle.classList.add('win');
     } else if (ptosTotalesOponente > ptosTotalesJugador) {
-        winnerTitle.textContent = 'Has perdido'; winnerTitle.classList.add('lose');
+        winnerTitle.textContent = t('lost'); winnerTitle.classList.add('lose');
     } else {
-        winnerTitle.textContent = '¡Empate!'; winnerTitle.classList.add('tie');
+        winnerTitle.textContent = t('tie'); winnerTitle.classList.add('tie');
     }
     
     winnerScoreText.textContent = `${ptosTotalesJugador} a ${ptosTotalesOponente}`;
@@ -189,6 +226,7 @@ function mostrarModalFinal() {
 }
 
 function reaccionarCambioServidor(dataSala, miRol) {
+    currentDataSala = dataSala;
     const estado = dataSala.estado;
     if(!estado) return;
 
@@ -198,11 +236,11 @@ function reaccionarCambioServidor(dataSala, miRol) {
     if (miRol === 'jugador1') {
         game.tableroJugador = parseArrayFB(estado.tablero1);
         game.tableroOponente = parseArrayFB(estado.tablero2);
-        opponentNameDisplay.textContent = dataSala.jugador2 ? dataSala.jugador2.nombre : "Esperando rival...";
+        opponentNameDisplay.textContent = dataSala.jugador2 ? dataSala.jugador2.nombre : t('waitingRival');
     } else {
         game.tableroJugador = parseArrayFB(estado.tablero2);
         game.tableroOponente = parseArrayFB(estado.tablero1);
-        opponentNameDisplay.textContent = dataSala.jugador1 ? dataSala.jugador1.nombre : "Host";
+        opponentNameDisplay.textContent = dataSala.jugador1 ? dataSala.jugador1.nombre : t('host');
     }
 
     renderTableros();
@@ -291,48 +329,48 @@ logoutBtn.addEventListener('click', async () => {
 createRoomBtn.addEventListener('click', async () => {
     try {
         const code = roomInput.value.trim();
-        if(!code) return alert("Escribe un código de sala primero.");
+        if(!code) return alert(t('errorRoomCode'));
         
-        createRoomBtn.innerHTML = '<span class="roll-btn-text">Cargando...</span>';
+        createRoomBtn.innerHTML = `<span class="roll-btn-text">${t('loading')}</span>`;
         
         await redFirebase.crearSala(code, playerNameDisplay.textContent);
         
-        createRoomBtn.innerHTML = '<span class="roll-btn-text">Crear Sala</span><span class="roll-btn-shine"></span>';
+        createRoomBtn.innerHTML = `<span class="roll-btn-text">${t('createRoom')}</span><span class="roll-btn-shine"></span>`;
         lobbyOverlay.classList.add('hidden');
         gameWrapper.classList.remove('hidden');
         
         redFirebase.escucharCambiosSala(reaccionarCambioServidor);
     } catch (error) {
-        createRoomBtn.innerHTML = '<span class="roll-btn-text">Crear Sala</span><span class="roll-btn-shine"></span>';
+        createRoomBtn.innerHTML = `<span class="roll-btn-text">${t('createRoom')}</span><span class="roll-btn-shine"></span>`;
         console.error(error);
-        alert("Error: " + error.message);
+        alert(t('errorFirebase') + error.message);
     }
 });
 
 joinRoomBtn.addEventListener('click', async () => {
     try {
         const code = roomInput.value.trim();
-        if(!code) return alert("Escribe un código de sala primero.");
+        if(!code) return alert(t('errorRoomCode'));
         
-        joinRoomBtn.innerHTML = '<span class="roll-btn-text">Cargando...</span>';
+        joinRoomBtn.innerHTML = `<span class="roll-btn-text">${t('loading')}</span>`;
         
         await redFirebase.unirseASala(code, playerNameDisplay.textContent);
         
-        joinRoomBtn.innerHTML = '<span class="roll-btn-text">Unirse a Sala</span><span class="roll-btn-shine"></span>';
+        joinRoomBtn.innerHTML = `<span class="roll-btn-text">${t('joinRoom')}</span><span class="roll-btn-shine"></span>`;
         lobbyOverlay.classList.add('hidden');
         gameWrapper.classList.remove('hidden');
         
         redFirebase.escucharCambiosSala(reaccionarCambioServidor);
     } catch (error) {
-        joinRoomBtn.innerHTML = '<span class="roll-btn-text">Unirse a Sala</span><span class="roll-btn-shine"></span>';
+        joinRoomBtn.innerHTML = `<span class="roll-btn-text">${t('joinRoom')}</span><span class="roll-btn-shine"></span>`;
         console.error(error);
-        alert("Error: " + error.message);
+        alert(t('errorFirebase') + error.message);
     }
 });
 
 redFirebase.observarEstadoSesion((user) => {
     if (user) {
-        const shortName = user.displayName || user.email || 'Jugador';
+        const shortName = user.displayName || user.email || 'Player';
         playerNameDisplay.textContent = shortName;
         loggedUserName.textContent = shortName;
         

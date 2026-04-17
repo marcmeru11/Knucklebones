@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Matatena (Knucklebones) – Clon de la interfaz del minijuego de Cult of the Lamb." />
-  <title>Matatena – Cult of the Lamb</title>
+  <meta name="description" content="Matatena (Knucklebones)" />
+  <title data-i18n="pageTitle">Matatena</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
@@ -13,25 +13,31 @@
 <body>
   
   <nav id="top-nav" class="top-nav hidden">
-    <div style="font-size: 0.85rem; opacity: 0.8;">Hola, <strong id="logged-user-name"></strong></div>
-    <button id="logout-btn" class="logout-btn">Cerrar Sesión</button>
+    <div style="font-size: 0.85rem; opacity: 0.8;"><span data-i18n="hello">Hi, </span><strong id="logged-user-name"></strong></div>
+    <div class="lang-switcher">
+      <button id="lang-en" class="lang-btn active">EN</button>
+      <button id="lang-es" class="lang-btn">ES</button>
+    </div>
+    <button id="logout-btn" class="logout-btn" data-i18n="logout">Log Out</button>
   </nav>
 
   <!-- PANTALLA DE INICIO DE SESIÓN -->
   <div id="login-overlay" class="modal-overlay">
     <div class="modal-content">
-      <h1 class="game-title">Matatena</h1>
-      <span class="game-subtitle" style="margin-bottom: 30px;">Cult of the Lamb</span>
-      <p class="winner-score" style="text-transform: none; letter-spacing: normal;">Inicia sesión para guardar tu progreso y unirte a una partida.</p>
+      <h1 class="game-title" data-i18n="gameTitle">Matatena</h1>
+      <span class="game-subtitle" style="margin-bottom: 30px;" data-i18n="gameSubtitle">Cult of the Lamb fan game</span>
+      <p class="winner-score" style="text-transform: none; letter-spacing: normal;" data-i18n="loginTitle">Log in to save your progress and join a match.</p>
       
       <div style="display:flex; flex-direction:column; gap: 15px; margin-top: 15px;">
-          <button id="login-github-btn" class="roll-btn restart-btn" style="border-color: #5b8fd4; background: linear-gradient(135deg, #5b8fd4 0%, #305f9e 100%); color: #fff; width: 100%;">
-            <span class="roll-btn-text">Iniciar sesión con GitHub</span>
+          <button id="login-github-btn" class="roll-btn restart-btn" style="border-color: #5b8fd4; background: linear-gradient(135deg, #5b8fd4 0%, #305f9e 100%); color: #fff; width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px;">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            <span class="roll-btn-text" data-i18n="loginGithub" style="margin: 0;">Log in with GitHub</span>
             <span class="roll-btn-shine"></span>
           </button>
           
-          <button id="login-google-btn" class="roll-btn restart-btn" style="border-color: #ea4335; background: linear-gradient(135deg, #ea4335 0%, #b31404 100%); color: #fff; width: 100%;">
-            <span class="roll-btn-text">Iniciar sesión con Google</span>
+          <button id="login-google-btn" class="roll-btn restart-btn" style="border-color: #ea4335; background: linear-gradient(135deg, #ea4335 0%, #b31404 100%); color: #fff; width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px;">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 15.8 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></svg>
+            <span class="roll-btn-text" data-i18n="loginGoogle" style="margin: 0;">Log in with Google</span>
             <span class="roll-btn-shine"></span>
           </button>
       </div>
@@ -41,20 +47,20 @@
   <!-- PANTALLA DE LOBBY / SALAS -->
   <div id="lobby-overlay" class="modal-overlay hidden">
     <div class="modal-content">
-      <h2 class="winner-title" style="font-size: 2rem; margin-bottom: 25px;">Multijugador</h2>
+      <h2 class="winner-title" style="font-size: 2rem; margin-bottom: 25px;" data-i18n="multiplayer">Multiplayer</h2>
       
-      <p class="winner-score" style="text-transform: none; font-size: 0.85rem; letter-spacing: normal; margin-bottom: 15px;">Escribe un código para crear una sala o unirte a la de un amigo.</p>
+      <p class="winner-score" style="text-transform: none; font-size: 0.85rem; letter-spacing: normal; margin-bottom: 15px;" data-i18n="roomSub">Enter a code to create a room or join a friend's room.</p>
       
-      <input type="text" id="room-input" class="room-input" placeholder="Ej: sala-secreta..." autocomplete="off">
+      <input type="text" id="room-input" class="room-input" placeholder="E.g. secret-room..." data-i18n-placeholder="roomPlaceholder" autocomplete="off">
       
       <div style="display:flex; flex-direction:column; gap: 12px; margin-top: 25px;">
           <button id="create-room-btn" class="roll-btn restart-btn">
-            <span class="roll-btn-text">Crear Sala</span>
+            <span class="roll-btn-text" data-i18n="createRoom">Create Room</span>
             <span class="roll-btn-shine"></span>
           </button>
           
           <button id="join-room-btn" class="roll-btn restart-btn" style="border-color: var(--clr-player); background: linear-gradient(135deg, #232a3b 0%, #171d2b 100%); color: var(--clr-player);">
-            <span class="roll-btn-text">Unirse a Sala</span>
+            <span class="roll-btn-text" data-i18n="joinRoom">Join Room</span>
             <span class="roll-btn-shine"></span>
           </button>
       </div>
@@ -71,18 +77,18 @@
       <div class="action-zone-inner">
 
         <div class="current-die-container">
-          <span class="action-label">Dado Actual</span>
+          <span class="action-label" data-i18n="currentDie">Current Die</span>
           <div class="current-die" id="current-die" aria-live="polite" aria-label="Dado actual vacío">
             <span class="die-value" id="die-value"></span>
           </div>
         </div>
 
         <button class="roll-btn" id="roll-btn" aria-label="Lanzar dado">
-          <span class="roll-btn-text">🎲 Lanzar</span>
+          <span class="roll-btn-text" data-i18n="rollBtn">🎲 Roll</span>
           <span class="roll-btn-shine"></span>
         </button>
 
-        <p class="action-hint" id="action-hint">Lanza el dado para comenzar tu turno.</p>
+        <p class="action-hint" id="action-hint" data-i18n="hintText">Roll the die to start your turn.</p>
 
       </div>
 
@@ -95,7 +101,7 @@
 
       <!-- Encabezado -->
       <header class="game-header">
-        <h1 class="game-title">Matatena</h1>
+        <h1 class="game-title" data-i18n="gameTitle">Matatena</h1>
         <span class="game-subtitle">Cult of the Lamb</span>
       </header>
 
@@ -103,9 +109,9 @@
       <section class="player-zone opponent-zone" aria-label="Zona del oponente">
 
         <div class="player-info">
-          <span class="player-name">Ratau</span>
+          <span class="player-name" data-i18n="host">Host</span>
           <div class="player-score-box">
-            <span class="score-label">Puntuación</span>
+            <span class="score-label" data-i18n="score">Score</span>
             <span class="player-score" id="opponent-total-score">0</span>
           </div>
         </div>
@@ -165,9 +171,9 @@
         </div>
 
         <div class="player-info">
-          <span id="player-name-display" class="player-name">Tú</span>
+          <span id="player-name-display" class="player-name" data-i18n="you">YOU</span>
           <div class="player-score-box">
-            <span class="score-label">Puntuación</span>
+            <span class="score-label" data-i18n="score">Score</span>
             <span class="player-score" id="player-total-score">0</span>
           </div>
         </div>
@@ -181,10 +187,10 @@
   <!-- MODAL DE FINAL DE PARTIDA -->
   <div id="game-over-modal" class="modal-overlay hidden">
     <div class="modal-content">
-      <h2 id="winner-title" class="winner-title">¡Ganaste!</h2>
+      <h2 id="winner-title" class="winner-title" data-i18n="victory">Victory!</h2>
       <p id="winner-score" class="winner-score">0 a 0</p>
       <button id="restart-btn" class="roll-btn restart-btn">
-        <span class="roll-btn-text">Jugar de Nuevo</span>
+        <span class="roll-btn-text" data-i18n="playAgain">Play Again</span>
         <span class="roll-btn-shine"></span>
       </button>
     </div>

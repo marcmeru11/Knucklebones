@@ -639,3 +639,36 @@ body {
   border-color: #d45b5b;
 }
 
+/* Language Switcher */
+.lang-switcher {
+  display: flex;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--clr-border-light);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+}
+
+.lang-btn {
+  background: transparent;
+  border: none;
+  color: var(--clr-text-muted);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.lang-btn.active {
+  background: var(--clr-surface-3);
+  color: var(--clr-player);
+  box-shadow: 0 0 6px rgba(91, 143, 212, 0.2);
+}
+
+.lang-btn:hover:not(.active) {
+  color: var(--clr-text);
+}
+
