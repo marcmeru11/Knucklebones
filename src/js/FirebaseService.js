@@ -20,14 +20,17 @@ class FirebaseService {
         this.githubProvider = new GithubAuthProvider();
         this.googleProvider = new GoogleAuthProvider();
         this.db = getDatabase(this.app);
-        
         this.currentUser = null;
         this.salaId = null;
         this.salaRef = null;
         this.miRol = null;
 
         setPersistence(this.auth, browserLocalPersistence).catch((error) => {
-            console.error("Error setting persistence:", error);
+            console.error(error);
+        });
+
+        onAuthStateChanged(this.auth, (user) => {
+            this.currentUser = user;
         });
     }
 
@@ -40,15 +43,19 @@ class FirebaseService {
 
     esperarUsuario() {
         return new Promise((resolve) => {
-            if (this.currentUser) {
-                resolve(this.currentUser);
-            } else {
-                const unsubscribe = onAuthStateChanged(this.auth, (user) => {
-                    unsubscribe();
-                    this.currentUser = user;
-                    resolve(user);
-                });
+            if (this.auth.currentUser) {
+                this.currentUser = this.auth.currentUser;
+                resolve(this.auth.currentUser);
+                return;
             }
+            const unsubscribe = onAuthStateChanged(this.auth, (user) => {
+                unsubscribe();
+                this.currentUser = user;
+                resolve(user);
+            });
+            setTimeout(() => {
+                resolve(this.auth.currentUser);
+            }, 2500);
         });
     }
 
@@ -69,39 +76,34 @@ class FirebaseService {
     }
 
     async limpiarSalasInactivas() {
-        const LIMITE_INACTIVIDAD = 5 * 60 * 1000; 
+        const LIMITE = 5 * 60 * 1000; 
         const roomsRef = ref(this.db, 'rooms');
         const snapshot = await get(roomsRef);
-
         if (snapshot.exists()) {
             const ahora = Date.now();
-            snapshot.forEach((childSnapshot) => {
-                const salaId = childSnapshot.key;
-                const data = childSnapshot.val();
-
-                if (!data.ultimaActividad || (ahora - data.ultimaActividad > LIMITE_INACTIVIDAD)) {
-                    remove(ref(this.db, `rooms/${salaId}`));
-                    console.log(`Sala ${salaId} eliminada por inactividad.`);
+            snapshot.forEach((child) => {
+                const data = child.val();
+                if (!data.ultimaActividad || (ahora - data.ultimaActividad > LIMITE)) {
+                    remove(ref(this.db, `rooms/${child.key}`));
                 }
             });
         }
     }
 
     async crearSala(salaId, nombreJugador) {
-        await this.esperarUsuario();
-        if (!this.currentUser) throw new Error("You are not logged in.");
+        const user = await this.esperarUsuario();
+        if (!user) throw new Error("Firebase Error: Auth session not found");
+        
         this.salaId = salaId;
         this.salaRef = ref(this.db, `rooms/${this.salaId}`);
-        
         const snapshot = await get(this.salaRef);
-        if(snapshot.exists()) {
-            throw new Error("Room already exists. Join it or choose another name.");
-        }
+        
+        if(snapshot.exists()) throw new Error("Firebase Error: Room already exists");
         
         this.miRol = 'jugador1';
-        await set(this.salaRef, {
+        return set(this.salaRef, {
             ultimaActividad: serverTimestamp(),
-            jugador1: { uid: this.currentUser.uid, nombre: nombreJugador },
+            jugador1: { uid: user.uid, nombre: nombreJugador },
             estado: {
                 tablero1: [[], [], []],
                 tablero2: [[], [], []],
@@ -112,28 +114,26 @@ class FirebaseService {
     }
 
     async unirseASala(salaId, nombreJugador) {
-        await this.esperarUsuario();
-        if (!this.currentUser) throw new Error("You are not logged in.");
+        const user = await this.esperarUsuario();
+        if (!user) throw new Error("Firebase Error: Auth session not found");
+
         this.salaId = salaId;
         this.salaRef = ref(this.db, `rooms/${this.salaId}`);
-        
         const snapshot = await get(this.salaRef);
-        if(!snapshot.exists()) {
-           throw new Error("Room does not exist. Please check the code.");
-        }
         
+        if(!snapshot.exists()) throw new Error("Firebase Error: Room not found");
         const data = snapshot.val();
         
-        if (data.jugador1 && data.jugador1.uid === this.currentUser.uid) {
+        if (data.jugador1 && data.jugador1.uid === user.uid) {
             this.miRol = 'jugador1';
-        } else if (!data.jugador2 || (data.jugador2 && data.jugador2.uid === this.currentUser.uid)) {
+        } else if (!data.jugador2 || (data.jugador2 && data.jugador2.uid === user.uid)) {
             this.miRol = 'jugador2';
             await update(this.salaRef, {
-                jugador2: { uid: this.currentUser.uid, nombre: nombreJugador },
+                jugador2: { uid: user.uid, nombre: nombreJugador },
                 ultimaActividad: serverTimestamp()
             });
         } else {
-            throw new Error("Room is full and the game has started.");
+            throw new Error("Firebase Error: Room is full");
         }
     }
 
@@ -141,8 +141,7 @@ class FirebaseService {
         if (!this.salaRef) return;
         onValue(this.salaRef, (snapshot) => {
             if (!snapshot.exists()) return;
-            const data = snapshot.val();
-            callback(data, this.miRol);
+            callback(snapshot.val(), this.miRol);
         });
     }
 
@@ -151,22 +150,22 @@ class FirebaseService {
         if (!this.salaId) return;
         return update(ref(this.db, `rooms/${this.salaId}`), {
             "estado/dadoActual": valorDado,
-            ultimaActividad: serverTimestamp() 
+            ultimaActividad: serverTimestamp()
         });
     }
 
-    async enviarMovimiento(tableroLocalMutado, tableroOponenteMutado, nuevoTurno) {
+    async enviarMovimiento(tab1, tab2, nextTurn) {
         await this.esperarUsuario();
         if (!this.salaId || !this.miRol) return;
         
-        let keyJugador = this.miRol === 'jugador1' ? 'tablero1' : 'tablero2';
-        let keyOponente = this.miRol === 'jugador1' ? 'tablero2' : 'tablero1';
+        const k1 = this.miRol === 'jugador1' ? 'tablero1' : 'tablero2';
+        const k2 = this.miRol === 'jugador1' ? 'tablero2' : 'tablero1';
         
         return update(ref(this.db, `rooms/${this.salaId}`), {
-            [`estado/${keyJugador}`]: tableroLocalMutado,
-            [`estado/${keyOponente}`]: tableroOponenteMutado,
+            [`estado/${k1}`]: tab1,
+            [`estado/${k2}`]: tab2,
             "estado/dadoActual": 0,
-            "estado/turno": nuevoTurno,
+            "estado/turno": nextTurn,
             ultimaActividad: serverTimestamp()
         });
     }
