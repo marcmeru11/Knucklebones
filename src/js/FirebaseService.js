@@ -27,7 +27,7 @@ class FirebaseService {
         this.miRol = null;
 
         setPersistence(this.auth, browserLocalPersistence).catch((error) => {
-            console.error("Error configurando persistencia:", error);
+            console.error("Error setting persistence:", error);
         });
     }
 
@@ -55,13 +55,13 @@ class FirebaseService {
     }
 
     async crearSala(salaId, nombreJugador) {
-        if (!this.currentUser) throw new Error("No estás logueado.");
+        if (!this.currentUser) throw new Error("You are not logged in.");
         this.salaId = salaId;
-        this.salaRef = ref(this.db, `partidas/${this.salaId}`);
+        this.salaRef = ref(this.db, `rooms/${this.salaId}`);
         
         const snapshot = await get(this.salaRef);
         if(snapshot.exists()) {
-            throw new Error("Esa sala ya existe. Únete a ella o elige otro nombre.");
+            throw new Error("Room already exists. Join it or choose another name.");
         }
         
         this.miRol = 'jugador1';
@@ -78,13 +78,13 @@ class FirebaseService {
     }
 
     async unirseASala(salaId, nombreJugador) {
-        if (!this.currentUser) throw new Error("No estás logueado.");
+        if (!this.currentUser) throw new Error("You are not logged in.");
         this.salaId = salaId;
-        this.salaRef = ref(this.db, `partidas/${this.salaId}`);
+        this.salaRef = ref(this.db, `rooms/${this.salaId}`);
         
         const snapshot = await get(this.salaRef);
         if(!snapshot.exists()) {
-           throw new Error("La sala no existe. Verifica el código.");
+           throw new Error("Room does not exist. Please check the code.");
         }
         
         const data = snapshot.val();
@@ -97,7 +97,7 @@ class FirebaseService {
                 jugador2: { uid: this.currentUser.uid, nombre: nombreJugador }
             });
         } else {
-            throw new Error("La sala ya está llena y la partida ha empezado.");
+            throw new Error("Room is full and the game has started.");
         }
     }
 
@@ -112,7 +112,7 @@ class FirebaseService {
 
     async enviarDado(valorDado) {
         if (!this.salaId) return;
-        return update(ref(this.db, `partidas/${this.salaId}/estado`), {
+        return update(ref(this.db, `rooms/${this.salaId}/state`), {
             dadoActual: valorDado
         });
     }
@@ -123,7 +123,7 @@ class FirebaseService {
         let keyJugador = this.miRol === 'jugador1' ? 'tablero1' : 'tablero2';
         let keyOponente = this.miRol === 'jugador1' ? 'tablero2' : 'tablero1';
         
-        return update(ref(this.db, `partidas/${this.salaId}/estado`), {
+        return update(ref(this.db, `rooms/${this.salaId}/state`), {
             [keyJugador]: tableroLocalMutado,
             [keyOponente]: tableroOponenteMutado,
             dadoActual: 0,
@@ -133,7 +133,7 @@ class FirebaseService {
 
     async reiniciarSala() {
         if (!this.salaId) return;
-        return update(ref(this.db, `partidas/${this.salaId}/estado`), {
+        return update(ref(this.db, `rooms/${this.salaId}/state`), {
             tablero1: [[], [], []],
             tablero2: [[], [], []],
             dadoActual: 0,
