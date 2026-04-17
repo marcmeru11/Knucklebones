@@ -17,6 +17,7 @@ const winnerTitle = document.getElementById('winner-title');
 const winnerScoreText = document.getElementById('winner-score');
 const restartBtn = document.getElementById('restart-btn');
 
+const loginOverlay = document.getElementById('login-overlay');
 const loginGithubBtn = document.getElementById('login-github-btn');
 const loginGoogleBtn = document.getElementById('login-google-btn');
 const lobbyOverlay = document.getElementById('lobby-overlay');
