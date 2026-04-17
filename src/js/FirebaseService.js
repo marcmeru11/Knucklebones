@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
-import { getAuth, GithubAuthProvider, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
+import { getAuth, GithubAuthProvider, GoogleAuthProvider, signInWithRedirect, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
 import { getDatabase, ref, onValue, set, update, get } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-database.js";
 
 const firebaseConfig = {
@@ -35,11 +35,11 @@ class FirebaseService {
     }
 
     async iniciarSesionConGithub() {
-        return signInWithPopup(this.auth, this.githubProvider);
+        return signInWithRedirect(this.auth, this.githubProvider);
     }
     
     async iniciarSesionConGoogle() {
-        return signInWithPopup(this.auth, this.googleProvider);
+        return signInWithRedirect(this.auth, this.googleProvider);
     }
     
     async cerrarSesion() {
