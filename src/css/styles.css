@@ -273,8 +273,7 @@ body {
 
 .dice-slot {
   width:  var(--slot-size);
-  height: var(--slot-size);
-  /* Hace que el slot se encoja si el espacio es menor al --slot-size */
+  height: auto; /* Let aspect-ratio dictate the height based on width, especially on mobile */
   max-width: 100%;
   aspect-ratio: 1;
   border-radius: var(--radius-sm);
@@ -476,24 +475,35 @@ body {
   body {
     overflow: auto;
     padding: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .top-nav {
+    position: static;
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 20px;
   }
 
   .game-wrapper {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
+    display: flex;
+    flex-direction: column;
     height: auto;
   }
 
   .boards-area {
-    grid-template-rows: auto auto auto auto;
+    order: 1;
   }
 
   .action-zone {
-    border-right: 1px solid var(--clr-border);
-    border-left: 1px solid var(--clr-border);
+    order: 2;
+    border: 1px solid var(--clr-border);
     border-top: 2px solid var(--clr-accent);
     box-shadow: 0 -4px 20px rgba(200,151,58,0.08);
     padding: 14px;
+    margin-top: 20px;
     align-self: stretch;
   }
 
