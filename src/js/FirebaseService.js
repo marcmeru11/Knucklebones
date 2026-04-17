@@ -62,8 +62,16 @@ class FirebaseService {
     async checkActiveSession() {
         const user = await this.esperarUsuario();
         if (!user) return null;
-        const snapshot = await get(ref(this.db, `active_players/${user.uid}`));
-        return snapshot.exists() ? snapshot.val() : null;
+        try {
+            const snapshot = await get(ref(this.db, `active_players/${user.uid}`));
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                return data.roomId ? data.roomId : (typeof data === 'string' ? data : null);
+            }
+        } catch (e) {
+            console.warn("Firebase Error: Could not check active session", e);
+        }
+        return null;
     }
 
     async clearActiveSession() {
@@ -127,7 +135,11 @@ class FirebaseService {
                 turno: 'jugador1'
             }
         });
-        await set(ref(this.db, `active_players/${user.uid}`), this.salaId);
+        try {
+            await set(ref(this.db, `active_players/${user.uid}`), { roomId: this.salaId });
+        } catch (e) {
+            console.error("Firebase Error: Could not save active_players", e);
+        }
     }
 
     async unirseASala(salaId, nombreJugador) {
@@ -152,7 +164,11 @@ class FirebaseService {
         } else {
             throw new Error("Firebase Error: Room is full");
         }
-        await set(ref(this.db, `active_players/${user.uid}`), this.salaId);
+        try {
+            await set(ref(this.db, `active_players/${user.uid}`), { roomId: this.salaId });
+        } catch (e) {
+            console.error("Firebase Error: Could not save active_players", e);
+        }
     }
 
     escucharCambiosSala(callback) {
