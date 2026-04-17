@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Matatena (Knucklebones) – Clon de la interfaz del minijuego de Cult of the Lamb." />
+  <title>Matatena – Cult of the Lamb</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <div class="game-wrapper">
+
+    <!-- ════════════════════════════════════════════════════
+         PANEL LATERAL DEL DADO
+    ═══════════════════════════════════════════════════════ -->
+    <aside class="action-zone" aria-label="Panel de acción">
+
+      <div class="action-zone-inner">
+
+        <div class="current-die-container">
+          <span class="action-label">Dado Actual</span>
+          <div class="current-die" id="current-die" aria-live="polite" aria-label="Dado actual vacío">
+            <span class="die-value" id="die-value"></span>
+          </div>
+        </div>
+
+        <button class="roll-btn" id="roll-btn" aria-label="Lanzar dado">
+          <span class="roll-btn-text">🎲 Lanzar</span>
+          <span class="roll-btn-shine"></span>
+        </button>
+
+        <p class="action-hint" id="action-hint">Lanza el dado para comenzar tu turno.</p>
+
+      </div>
+
+    </aside>
+
+    <!-- ════════════════════════════════════════════════════
+         ÁREA DE TABLEROS (columna principal)
+    ═══════════════════════════════════════════════════════ -->
+    <div class="boards-area">
+
+      <!-- Encabezado -->
+      <header class="game-header">
+        <h1 class="game-title">Matatena</h1>
+        <span class="game-subtitle">Cult of the Lamb</span>
+      </header>
+
+      <!-- ── ZONA DEL OPONENTE (Arriba) ── -->
+      <section class="player-zone opponent-zone" aria-label="Zona del oponente">
+
+        <div class="player-info">
+          <span class="player-name">Ratau</span>
+          <div class="player-score-box">
+            <span class="score-label">Puntuación</span>
+            <span class="player-score" id="opponent-total-score">0</span>
+          </div>
+        </div>
+
+        <div class="board opponent-board" id="opponent-board" aria-label="Tablero de Ratau">
+          <div class="column" id="opp-col-0" aria-label="Columna 1 del oponente">
+            <div class="dice-slot" data-player="opponent" data-col="0" data-row="0"></div>
+            <div class="dice-slot" data-player="opponent" data-col="0" data-row="1"></div>
+            <div class="dice-slot" data-player="opponent" data-col="0" data-row="2"></div>
+            <div class="col-score" id="opp-col-score-0">0</div>
+          </div>
+          <div class="column" id="opp-col-1" aria-label="Columna 2 del oponente">
+            <div class="dice-slot" data-player="opponent" data-col="1" data-row="0"></div>
+            <div class="dice-slot" data-player="opponent" data-col="1" data-row="1"></div>
+            <div class="dice-slot" data-player="opponent" data-col="1" data-row="2"></div>
+            <div class="col-score" id="opp-col-score-1">0</div>
+          </div>
+          <div class="column" id="opp-col-2" aria-label="Columna 3 del oponente">
+            <div class="dice-slot" data-player="opponent" data-col="2" data-row="0"></div>
+            <div class="dice-slot" data-player="opponent" data-col="2" data-row="1"></div>
+            <div class="dice-slot" data-player="opponent" data-col="2" data-row="2"></div>
+            <div class="col-score" id="opp-col-score-2">0</div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Separador central decorativo -->
+      <div class="boards-divider" aria-hidden="true">
+        <span class="divider-line"></span>
+        <span class="divider-icon">⚔</span>
+        <span class="divider-line"></span>
+      </div>
+
+      <!-- ── ZONA DEL JUGADOR (Abajo) ── -->
+      <section class="player-zone player-bottom-zone" aria-label="Zona del jugador">
+
+        <div class="board player-board" id="player-board" aria-label="Tablero del jugador">
+          <div class="column player-column" id="player-col-0" aria-label="Columna 1 del jugador" tabindex="0" role="button">
+            <div class="col-score" id="player-col-score-0">0</div>
+            <div class="dice-slot" data-player="player" data-col="0" data-row="0"></div>
+            <div class="dice-slot" data-player="player" data-col="0" data-row="1"></div>
+            <div class="dice-slot" data-player="player" data-col="0" data-row="2"></div>
+          </div>
+          <div class="column player-column" id="player-col-1" aria-label="Columna 2 del jugador" tabindex="0" role="button">
+            <div class="col-score" id="player-col-score-1">0</div>
+            <div class="dice-slot" data-player="player" data-col="1" data-row="0"></div>
+            <div class="dice-slot" data-player="player" data-col="1" data-row="1"></div>
+            <div class="dice-slot" data-player="player" data-col="1" data-row="2"></div>
+          </div>
+          <div class="column player-column" id="player-col-2" aria-label="Columna 3 del jugador" tabindex="0" role="button">
+            <div class="col-score" id="player-col-score-2">0</div>
+            <div class="dice-slot" data-player="player" data-col="2" data-row="0"></div>
+            <div class="dice-slot" data-player="player" data-col="2" data-row="1"></div>
+            <div class="dice-slot" data-player="player" data-col="2" data-row="2"></div>
+          </div>
+        </div>
+
+        <div class="player-info">
+          <span class="player-name">Tú</span>
+          <div class="player-score-box">
+            <span class="score-label">Puntuación</span>
+            <span class="player-score" id="player-total-score">0</span>
+          </div>
+        </div>
+
+      </section>
+
+    </div><!-- /.boards-area -->
+
+  </div><!-- /.game-wrapper -->
+
+  <!-- MODAL DE FINAL DE PARTIDA -->
+  <div id="game-over-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <h2 id="winner-title" class="winner-title">¡Ganaste!</h2>
+      <p id="winner-score" class="winner-score">0 a 0</p>
+      <button id="restart-btn" class="roll-btn restart-btn">
+        <span class="roll-btn-text">Jugar de Nuevo</span>
+        <span class="roll-btn-shine"></span>
+      </button>
+    </div>
+  </div>
+
+  <script src="MatatenaLogic.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
