@@ -11,8 +11,57 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  
+  <nav id="top-nav" class="top-nav hidden">
+    <div style="font-size: 0.85rem; opacity: 0.8;">Hola, <strong id="logged-user-name"></strong></div>
+    <button id="logout-btn" class="logout-btn">Cerrar Sesión</button>
+  </nav>
 
-  <div class="game-wrapper">
+  <!-- PANTALLA DE INICIO DE SESIÓN -->
+  <div id="login-overlay" class="modal-overlay">
+    <div class="modal-content">
+      <h1 class="game-title">Matatena</h1>
+      <span class="game-subtitle" style="margin-bottom: 30px;">Cult of the Lamb</span>
+      <p class="winner-score" style="text-transform: none; letter-spacing: normal;">Inicia sesión para guardar tu progreso y unirte a una partida.</p>
+      
+      <div style="display:flex; flex-direction:column; gap: 15px; margin-top: 15px;">
+          <button id="login-github-btn" class="roll-btn restart-btn" style="border-color: #5b8fd4; background: linear-gradient(135deg, #5b8fd4 0%, #305f9e 100%); color: #fff; width: 100%;">
+            <span class="roll-btn-text">Iniciar sesión con GitHub</span>
+            <span class="roll-btn-shine"></span>
+          </button>
+          
+          <button id="login-google-btn" class="roll-btn restart-btn" style="border-color: #ea4335; background: linear-gradient(135deg, #ea4335 0%, #b31404 100%); color: #fff; width: 100%;">
+            <span class="roll-btn-text">Iniciar sesión con Google</span>
+            <span class="roll-btn-shine"></span>
+          </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANTALLA DE LOBBY / SALAS -->
+  <div id="lobby-overlay" class="modal-overlay hidden">
+    <div class="modal-content">
+      <h2 class="winner-title" style="font-size: 2rem; margin-bottom: 25px;">Multijugador</h2>
+      
+      <p class="winner-score" style="text-transform: none; font-size: 0.85rem; letter-spacing: normal; margin-bottom: 15px;">Escribe un código para crear una sala o unirte a la de un amigo.</p>
+      
+      <input type="text" id="room-input" class="room-input" placeholder="Ej: sala-secreta..." autocomplete="off">
+      
+      <div style="display:flex; flex-direction:column; gap: 12px; margin-top: 25px;">
+          <button id="create-room-btn" class="roll-btn restart-btn">
+            <span class="roll-btn-text">Crear Sala</span>
+            <span class="roll-btn-shine"></span>
+          </button>
+          
+          <button id="join-room-btn" class="roll-btn restart-btn" style="border-color: var(--clr-player); background: linear-gradient(135deg, #232a3b 0%, #171d2b 100%); color: var(--clr-player);">
+            <span class="roll-btn-text">Unirse a Sala</span>
+            <span class="roll-btn-shine"></span>
+          </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="game-wrapper" class="game-wrapper hidden">
 
     <!-- ════════════════════════════════════════════════════
          PANEL LATERAL DEL DADO
@@ -116,7 +165,7 @@
         </div>
 
         <div class="player-info">
-          <span class="player-name">Tú</span>
+          <span id="player-name-display" class="player-name">Tú</span>
           <div class="player-score-box">
             <span class="score-label">Puntuación</span>
             <span class="player-score" id="player-total-score">0</span>
@@ -142,6 +191,6 @@
   </div>
 
   <script src="MatatenaLogic.js"></script>
-  <script src="script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>

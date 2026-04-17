@@ -35,7 +35,6 @@ class MatatenaLogic {
         }
     }
 
-    // 4. El movimiento principal
     colocarDado(columnaIndex, esJugador) {
         let tablero = esJugador ? this.tableroJugador : this.tableroOponente;
 

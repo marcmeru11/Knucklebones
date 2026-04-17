@@ -85,6 +85,10 @@ body {
   align-items: stretch;
 }
 
+.game-wrapper.hidden {
+  display: none;
+}
+
 /* ── Boards area ──────────────────────────────────────────── */
 .boards-area {
   display: grid;
@@ -582,3 +586,56 @@ body {
   font-size: clamp(0.85rem, 2vh, 1rem);
   border: 2px solid var(--clr-accent);
 }
+
+.room-input {
+  width: 100%;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--clr-border-light);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  color: var(--clr-text);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  text-align: center;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.room-input:focus {
+  border-color: var(--clr-player);
+  box-shadow: 0 0 12px var(--clr-player-glow);
+}
+
+.top-nav {
+  position: fixed;
+  top: 15px;
+  right: 20px;
+  z-index: 1001; /* Sobre modal-overlay (1000) si es necesario */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--clr-text);
+  font-family: var(--font-body);
+}
+
+.top-nav.hidden {
+  display: none;
+}
+
+.logout-btn {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--clr-border-light);
+  color: var(--clr-text);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.logout-btn:hover {
+  background: #d45b5b;
+  border-color: #d45b5b;
+}
+
