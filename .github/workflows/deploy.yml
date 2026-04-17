@@ -31,14 +31,14 @@ jobs:
         # Busca los Strings temporales en FirebaseService.js y los 
         # sustituye por los valores reales alojados en GitHub Secrets.
         run: |
-          sed -i "s|FIREBASE_API_KEY|${{ secrets.FIREBASE_API_KEY }}|g" FirebaseService.js
-          sed -i "s|FIREBASE_AUTHDOMAIN|${{ secrets.FIREBASE_AUTHDOMAIN }}|g" FirebaseService.js
-          sed -i "s|FIREBASE_PROJECTID|${{ secrets.FIREBASE_PROJECTID }}|g" FirebaseService.js
-          sed -i "s|FIREBASE_DATABASEURL|${{ secrets.FIREBASE_DATABASEURL }}|g" FirebaseService.js
-          sed -i "s|FIREBASE_STORAGEBUCKET|${{ secrets.FIREBASE_STORAGEBUCKET }}|g" FirebaseService.js
-          sed -i "s|FIREBASE_MESSAGINGSENDERID|${{ secrets.FIREBASE_MESSAGINGSENDERID }}|g" FirebaseService.js
-          sed -i "s|FIREBASE_APPID|${{ secrets.FIREBASE_APPID }}|g" FirebaseService.js
-          sed -i "s|FIREBASE_MEASUREMENTID|${{ secrets.FIREBASE_MEASUREMENTID }}|g" FirebaseService.js
+          sed -i "s|FIREBASE_API_KEY|${{ secrets.FIREBASE_API_KEY }}|g" src/js/FirebaseService.js
+          sed -i "s|FIREBASE_AUTHDOMAIN|${{ secrets.FIREBASE_AUTHDOMAIN }}|g" src/js/FirebaseService.js
+          sed -i "s|FIREBASE_PROJECTID|${{ secrets.FIREBASE_PROJECTID }}|g" src/js/FirebaseService.js
+          sed -i "s|FIREBASE_DATABASEURL|${{ secrets.FIREBASE_DATABASEURL }}|g" src/js/FirebaseService.js
+          sed -i "s|FIREBASE_STORAGEBUCKET|${{ secrets.FIREBASE_STORAGEBUCKET }}|g" src/js/FirebaseService.js
+          sed -i "s|FIREBASE_MESSAGINGSENDERID|${{ secrets.FIREBASE_MESSAGINGSENDERID }}|g" src/js/FirebaseService.js
+          sed -i "s|FIREBASE_APPID|${{ secrets.FIREBASE_APPID }}|g" src/js/FirebaseService.js
+          sed -i "s|FIREBASE_MEASUREMENTID|${{ secrets.FIREBASE_MEASUREMENTID }}|g" src/js/FirebaseService.js
 
       - name: ⚙️ Setup Pages
         uses: actions/configure-pages@v4
