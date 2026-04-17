@@ -154,7 +154,11 @@ class FirebaseService {
             this.unsubscribeSala = null;
         }
         if (this.salaId) {
-            await remove(ref(this.db, `rooms/${this.salaId}`));
+            try {
+                await remove(ref(this.db, `rooms/${this.salaId}`));
+            } catch (e) {
+                console.warn("Could not delete room from DB:", e);
+            }
         }
         this.salaId = null;
         this.salaRef = null;

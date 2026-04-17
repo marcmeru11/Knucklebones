@@ -410,6 +410,7 @@ redFirebase.observarEstadoSesion((user) => {
         topNav.classList.remove('hidden');
         lobbyOverlay.classList.remove('hidden');
         gameWrapper.classList.add('hidden');
+        leaveBtn.classList.add('hidden');
         
         redFirebase.limpiarSalasInactivas();
     } else {
@@ -417,5 +418,6 @@ redFirebase.observarEstadoSesion((user) => {
         topNav.classList.add('hidden');
         lobbyOverlay.classList.add('hidden');
         gameWrapper.classList.add('hidden');
+        leaveBtn.classList.add('hidden');
     }
 });

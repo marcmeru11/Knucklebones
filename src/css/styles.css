@@ -649,6 +649,10 @@ body {
   border-color: #d45b5b;
 }
 
+#leave-btn.hidden {
+  display: none;
+}
+
 /* Language Switcher */
 .lang-switcher {
   display: flex;
