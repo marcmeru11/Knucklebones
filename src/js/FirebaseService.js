@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
-import { getAuth, GithubAuthProvider, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
+import { getAuth, GithubAuthProvider, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
 import { getDatabase, ref, onValue, set, update, get } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-database.js";
 
 const firebaseConfig = {
@@ -26,9 +26,8 @@ class FirebaseService {
         this.salaRef = null;
         this.miRol = null;
 
-        // Captura posibles errores silenciosos al volver de la redirección en móviles
-        getRedirectResult(this.auth).catch((error) => {
-            console.error("Error tras la redirección de autenticación:", error);
+        setPersistence(this.auth, browserLocalPersistence).catch((error) => {
+            console.error("Error configurando persistencia:", error);
         });
     }
 
@@ -39,13 +38,12 @@ class FirebaseService {
         });
     }
 
-    // AHORA USAMOS REDIRECT PARA EVITAR EL BUCLE EN MÓVILES
     async iniciarSesionConGithub() {
-        return signInWithRedirect(this.auth, this.githubProvider);
+        return signInWithPopup(this.auth, this.githubProvider);
     }
     
     async iniciarSesionConGoogle() {
-        return signInWithRedirect(this.auth, this.googleProvider);
+        return signInWithPopup(this.auth, this.googleProvider);
     }
     
     async cerrarSesion() {
