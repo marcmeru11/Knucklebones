@@ -85,9 +85,8 @@ class FirebaseService {
         
         this.miRol = 'jugador1';
         await set(this.salaRef, {
-            ultimaActividad: Date.now(), // ✅ valor numérico real, no serverTimestamp
+            ultimaActividad: Date.now(),
             jugador1: { uid: this.currentUser.uid, nombre: nombreJugador },
-            // ✅ jugador2 eliminado (no escribir null)
             estado: {
                 tablero1: [[], [], []],
                 tablero2: [[], [], []],
