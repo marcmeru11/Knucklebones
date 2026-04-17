@@ -1,5 +1,5 @@
-import { redFirebase } from './FirebaseService.js';
-import { setLanguage, t } from './i18n.js';
+import { redFirebase } from './FirebaseService.js?v=3';
+import { setLanguage, t } from './i18n.js?v=3';
 
 const game = new MatatenaLogic();
 let turnoActual = 'jugador1';

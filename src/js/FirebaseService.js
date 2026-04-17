@@ -24,6 +24,7 @@ class FirebaseService {
         this.salaId = null;
         this.salaRef = null;
         this.miRol = null;
+        this.unsubscribeSala = null;
 
         setPersistence(this.auth, browserLocalPersistence).catch((error) => {
             console.error(error);
@@ -66,20 +67,21 @@ class FirebaseService {
             const snapshot = await get(ref(this.db, `active_players/${user.uid}`));
             if (snapshot.exists()) {
                 const data = snapshot.val();
-                return data.roomId ? data.roomId : (typeof data === 'string' ? data : null);
+                return typeof data === 'object' ? data.roomId : data;
             }
         } catch (e) {
-            console.warn("Firebase Error: Could not check active session", e);
+            console.warn("Firebase Error: Connection failed", e);
         }
         return null;
     }
 
     async clearActiveSession() {
-        if (!this.currentUser) return;
+        const user = await this.esperarUsuario();
+        if (!user) return;
         try {
-            await remove(ref(this.db, `active_players/${this.currentUser.uid}`));
+            await remove(ref(this.db, `active_players/${user.uid}`));
         } catch (e) {
-            console.error("Firebase Error: Could not clear active session", e);
+            console.error("Firebase Error: Permission denied or connection lost", e);
         }
     }
 
@@ -92,6 +94,7 @@ class FirebaseService {
     }
     
     async cerrarSesion() {
+        await this.clearActiveSession();
         return signOut(this.auth);
     }
     
@@ -100,14 +103,14 @@ class FirebaseService {
     }
 
     async limpiarSalasInactivas() {
-        const LIMITE = 5 * 60 * 1000; 
+        const LIMIT = 300000; 
         const roomsRef = ref(this.db, 'rooms');
         const snapshot = await get(roomsRef);
         if (snapshot.exists()) {
-            const ahora = Date.now();
+            const nowTime = Date.now();
             snapshot.forEach((child) => {
                 const data = child.val();
-                if (!data.ultimaActividad || (ahora - data.ultimaActividad > LIMITE)) {
+                if (!data.ultimaActividad || (nowTime - data.ultimaActividad > LIMIT)) {
                     remove(ref(this.db, `rooms/${child.key}`));
                 }
             });
@@ -135,11 +138,8 @@ class FirebaseService {
                 turno: 'jugador1'
             }
         });
-        try {
-            await set(ref(this.db, `active_players/${user.uid}`), { roomId: this.salaId });
-        } catch (e) {
-            console.error("Firebase Error: Could not save active_players", e);
-        }
+
+        return set(ref(this.db, `active_players/${user.uid}`), { roomId: this.salaId });
     }
 
     async unirseASala(salaId, nombreJugador) {
@@ -150,9 +150,12 @@ class FirebaseService {
         this.salaRef = ref(this.db, `rooms/${this.salaId}`);
         const snapshot = await get(this.salaRef);
         
-        if(!snapshot.exists()) throw new Error("Firebase Error: Room not found");
-        const data = snapshot.val();
+        if(!snapshot.exists()) {
+            await this.clearActiveSession();
+            throw new Error("Firebase Error: Room not found");
+        }
         
+        const data = snapshot.val();
         if (data.jugador1 && data.jugador1.uid === user.uid) {
             this.miRol = 'jugador1';
         } else if (!data.jugador2 || (data.jugador2 && data.jugador2.uid === user.uid)) {
@@ -164,15 +167,13 @@ class FirebaseService {
         } else {
             throw new Error("Firebase Error: Room is full");
         }
-        try {
-            await set(ref(this.db, `active_players/${user.uid}`), { roomId: this.salaId });
-        } catch (e) {
-            console.error("Firebase Error: Could not save active_players", e);
-        }
+
+        return set(ref(this.db, `active_players/${user.uid}`), { roomId: this.salaId });
     }
 
     escucharCambiosSala(callback) {
         if (!this.salaRef) return;
+        if (this.unsubscribeSala) this.unsubscribeSala();
         this.unsubscribeSala = onValue(this.salaRef, (snapshot) => {
             if (!snapshot.exists()) {
                 callback(null, this.miRol);
@@ -188,21 +189,14 @@ class FirebaseService {
             this.unsubscribeSala();
             this.unsubscribeSala = null;
         }
-        if (this.salaId) {
-            try {
-                await remove(ref(this.db, `rooms/${this.salaId}`));
-            } catch (e) {
-                console.warn("Firebase Error: Could not delete room from DB", e);
-            }
-        }
         this.salaId = null;
         this.salaRef = null;
         this.miRol = null;
     }
 
     async enviarDado(valorDado) {
-        await this.esperarUsuario();
-        if (!this.salaId) return;
+        const user = await this.esperarUsuario();
+        if (!user || !this.salaId) return;
         return update(ref(this.db, `rooms/${this.salaId}`), {
             "estado/dadoActual": valorDado,
             ultimaActividad: serverTimestamp()
@@ -210,8 +204,8 @@ class FirebaseService {
     }
 
     async enviarMovimiento(tab1, tab2, nextTurn) {
-        await this.esperarUsuario();
-        if (!this.salaId || !this.miRol) return;
+        const user = await this.esperarUsuario();
+        if (!user || !this.salaId || !this.miRol) return;
         
         const k1 = this.miRol === 'jugador1' ? 'tablero1' : 'tablero2';
         const k2 = this.miRol === 'jugador1' ? 'tablero2' : 'tablero1';
@@ -226,7 +220,8 @@ class FirebaseService {
     }
 
     async reiniciarSala() {
-        if (!this.salaId) return;
+        const user = await this.esperarUsuario();
+        if (!user || !this.salaId) return;
         return update(ref(this.db, `rooms/${this.salaId}`), {
             "estado/tablero1": [[], [], []],
             "estado/tablero2": [[], [], []],
