@@ -59,6 +59,22 @@ class FirebaseService {
         });
     }
 
+    async checkActiveSession() {
+        const user = await this.esperarUsuario();
+        if (!user) return null;
+        const snapshot = await get(ref(this.db, `active_players/${user.uid}`));
+        return snapshot.exists() ? snapshot.val() : null;
+    }
+
+    async clearActiveSession() {
+        if (!this.currentUser) return;
+        try {
+            await remove(ref(this.db, `active_players/${this.currentUser.uid}`));
+        } catch (e) {
+            console.error("Firebase Error: Could not clear active session", e);
+        }
+    }
+
     async iniciarSesionConGithub() {
         return signInWithPopup(this.auth, this.githubProvider);
     }
@@ -101,7 +117,7 @@ class FirebaseService {
         if(snapshot.exists()) throw new Error("Firebase Error: Room already exists");
         
         this.miRol = 'jugador1';
-        return set(this.salaRef, {
+        await set(this.salaRef, {
             ultimaActividad: serverTimestamp(),
             jugador1: { uid: user.uid, nombre: nombreJugador },
             estado: {
@@ -111,6 +127,7 @@ class FirebaseService {
                 turno: 'jugador1'
             }
         });
+        await set(ref(this.db, `active_players/${user.uid}`), this.salaId);
     }
 
     async unirseASala(salaId, nombreJugador) {
@@ -135,6 +152,7 @@ class FirebaseService {
         } else {
             throw new Error("Firebase Error: Room is full");
         }
+        await set(ref(this.db, `active_players/${user.uid}`), this.salaId);
     }
 
     escucharCambiosSala(callback) {
@@ -149,6 +167,7 @@ class FirebaseService {
     }
 
     async abandonarSala() {
+        await this.clearActiveSession();
         if (this.unsubscribeSala) {
             this.unsubscribeSala();
             this.unsubscribeSala = null;
@@ -157,7 +176,7 @@ class FirebaseService {
             try {
                 await remove(ref(this.db, `rooms/${this.salaId}`));
             } catch (e) {
-                console.warn("Could not delete room from DB:", e);
+                console.warn("Firebase Error: Could not delete room from DB", e);
             }
         }
         this.salaId = null;

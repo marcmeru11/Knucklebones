@@ -400,7 +400,7 @@ joinRoomBtn.addEventListener('click', async () => {
     }
 });
 
-redFirebase.observarEstadoSesion((user) => {
+redFirebase.observarEstadoSesion(async (user) => {
     if (user) {
         const shortName = user.displayName || user.email || 'Player';
         playerNameDisplay.textContent = shortName;
@@ -408,11 +408,29 @@ redFirebase.observarEstadoSesion((user) => {
         
         loginOverlay.classList.add('hidden');
         topNav.classList.remove('hidden');
-        lobbyOverlay.classList.remove('hidden');
-        gameWrapper.classList.add('hidden');
-        leaveBtn.classList.add('hidden');
         
         redFirebase.limpiarSalasInactivas();
+        
+        const salaIdActual = await redFirebase.checkActiveSession();
+        if (salaIdActual) {
+            try {
+                await redFirebase.unirseASala(salaIdActual, shortName);
+                lobbyOverlay.classList.add('hidden');
+                gameWrapper.classList.remove('hidden');
+                leaveBtn.classList.remove('hidden');
+                redFirebase.escucharCambiosSala(reaccionarCambioServidor);
+            } catch (error) {
+                console.error("Room missing or expired", error);
+                await redFirebase.clearActiveSession();
+                lobbyOverlay.classList.remove('hidden');
+                gameWrapper.classList.add('hidden');
+                leaveBtn.classList.add('hidden');
+            }
+        } else {
+            lobbyOverlay.classList.remove('hidden');
+            gameWrapper.classList.add('hidden');
+            leaveBtn.classList.add('hidden');
+        }
     } else {
         loginOverlay.classList.remove('hidden');
         topNav.classList.add('hidden');
