@@ -1,17 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
 import { getAuth, GithubAuthProvider, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
 import { getDatabase, ref, onValue, set, update, get, serverTimestamp, remove } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-database.js";
-
-const firebaseConfig = {
-  apiKey: "FIREBASE_API_KEY",
-  authDomain: "FIREBASE_AUTHDOMAIN",
-  projectId: "FIREBASE_PROJECTID",
-  databaseURL: "FIREBASE_DATABASEURL",
-  storageBucket: "FIREBASE_STORAGEBUCKET",
-  messagingSenderId: "FIREBASE_MESSAGINGSENDERID",
-  appId: "FIREBASE_APPID",
-  measurementId: "FIREBASE_MEASUREMENTID"
-};
+import { firebaseConfig } from './firebase-config.js';
 
 class FirebaseService {
     constructor() {

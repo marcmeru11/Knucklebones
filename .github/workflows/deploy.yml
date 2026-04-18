@@ -29,14 +29,14 @@ jobs:
 
       - name: 🔐 Firebase Configuration
         run: |
-          sed -i "s|FIREBASE_API_KEY|${{ secrets.FIREBASE_API_KEY }}|g" src/js/FirebaseService.js
-          sed -i "s|FIREBASE_AUTHDOMAIN|${{ secrets.FIREBASE_AUTHDOMAIN }}|g" src/js/FirebaseService.js
-          sed -i "s|FIREBASE_PROJECTID|${{ secrets.FIREBASE_PROJECTID }}|g" src/js/FirebaseService.js
-          sed -i "s|FIREBASE_DATABASEURL|${{ secrets.FIREBASE_DATABASEURL }}|g" src/js/FirebaseService.js
-          sed -i "s|FIREBASE_STORAGEBUCKET|${{ secrets.FIREBASE_STORAGEBUCKET }}|g" src/js/FirebaseService.js
-          sed -i "s|FIREBASE_MESSAGINGSENDERID|${{ secrets.FIREBASE_MESSAGINGSENDERID }}|g" src/js/FirebaseService.js
-          sed -i "s|FIREBASE_APPID|${{ secrets.FIREBASE_APPID }}|g" src/js/FirebaseService.js
-          sed -i "s|FIREBASE_MEASUREMENTID|${{ secrets.FIREBASE_MEASUREMENTID }}|g" src/js/FirebaseService.js
+          sed -i "s|FIREBASE_API_KEY|${{ secrets.FIREBASE_API_KEY }}|g" src/js/firebase-config.js
+          sed -i "s|FIREBASE_AUTHDOMAIN|${{ secrets.FIREBASE_AUTHDOMAIN }}|g" src/js/firebase-config.js
+          sed -i "s|FIREBASE_PROJECTID|${{ secrets.FIREBASE_PROJECTID }}|g" src/js/firebase-config.js
+          sed -i "s|FIREBASE_DATABASEURL|${{ secrets.FIREBASE_DATABASEURL }}|g" src/js/firebase-config.js
+          sed -i "s|FIREBASE_STORAGEBUCKET|${{ secrets.FIREBASE_STORAGEBUCKET }}|g" src/js/firebase-config.js
+          sed -i "s|FIREBASE_MESSAGINGSENDERID|${{ secrets.FIREBASE_MESSAGINGSENDERID }}|g" src/js/firebase-config.js
+          sed -i "s|FIREBASE_APPID|${{ secrets.FIREBASE_APPID }}|g" src/js/firebase-config.js
+          sed -i "s|FIREBASE_MEASUREMENTID|${{ secrets.FIREBASE_MEASUREMENTID }}|g" src/js/firebase-config.js
 
       - name: ⚙️ Setup Pages
         uses: actions/configure-pages@v4
