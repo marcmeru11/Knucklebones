@@ -28,7 +28,9 @@ export const UIManager = {
         playerNameDisplay: document.getElementById('player-name-display'),
         opponentNameDisplay: document.querySelector('.opponent-zone .player-name'),
         langEnBtn: document.getElementById('lang-en'),
-        langEsBtn: document.getElementById('lang-es')
+        langEsBtn: document.getElementById('lang-es'),
+        startSinglePlayerBtn: document.getElementById('start-single-player-btn'),
+        difficultyBtns: document.querySelectorAll('.difficulty-btn')
     },
 
     getDiceSVG(valor) {
@@ -132,15 +134,34 @@ export const UIManager = {
         this.elements.opponentTotalScore.textContent = ptosTotalesOponente;
     },
 
-    actualizarIndicadorTurno(dataSala, miRol) {
+    actualizarIndicadorTurno(dataSala, miRol, isSinglePlayer = false, isCpuThinking = false) {
+        const { hintText } = this.elements;
+        const rollBtnText = document.querySelector('.roll-btn-text');
+
+        if (isSinglePlayer) {
+            if (isCpuThinking) {
+                hintText.innerHTML = `<strong style="color: #d45b5b">${t('cpuThinking')}</strong>`;
+                rollBtnText.textContent = t('rollWait');
+                return;
+            }
+
+            if (miRol === 'jugador1') { // Turno del humano
+                hintText.innerHTML = `<strong style="color: var(--clr-player)">${t('turnYou')}</strong>`;
+                rollBtnText.textContent = t('rollYou');
+            } else { // Turno de la CPU
+                hintText.innerHTML = `<strong style="color: #d45b5b">${t('cpuTurn')}</strong>`;
+                rollBtnText.textContent = t('rollWait');
+            }
+            return;
+        }
+
         if (!dataSala || !dataSala.estado) return;
         const turnoServer = dataSala.estado.turno;
-        const { hintText } = this.elements;
         
         const faltaRival = !dataSala.jugador1 || !dataSala.jugador2;
         if (faltaRival) {
             hintText.innerHTML = `<strong style="color: var(--clr-text-muted)">${t('statusWaiting')}</strong>`;
-            document.querySelector('.roll-btn-text').textContent = t('rollWaiting');
+            rollBtnText.textContent = t('rollWaiting');
             return;
         }
         
@@ -149,11 +170,11 @@ export const UIManager = {
 
         if (turnoServer === miRol) {
             hintText.innerHTML = `<strong style="color: var(--clr-player)">${t('turnYou')}</strong>`;
-            document.querySelector('.roll-btn-text').textContent = t('rollYou');
+            rollBtnText.textContent = t('rollYou');
         } else {
             const nombreRival = miRol === 'jugador1' ? nombreJ2 : nombreJ1;
             hintText.innerHTML = `${t('turnOpponent')}<strong style="color: #d45b5b">${nombreRival.toUpperCase()}</strong>`;
-            document.querySelector('.roll-btn-text').textContent = t('rollWait');
+            rollBtnText.textContent = t('rollWait');
         }
     },
 

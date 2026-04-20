@@ -3,8 +3,11 @@ import { setLanguage, t } from './i18n.js?v=3';
 import { UIManager } from './UIManager.js?v=3';
 
 const game = new MatatenaLogic();
+const ai = new MatatenaAI();
 let turnoActual = 'jugador1';
 let currentDataSala = null;
+let isSinglePlayer = false;
+let aiDifficulty = 'easy';
 
 const { elements } = UIManager;
 
@@ -23,6 +26,12 @@ elements.langEsBtn.addEventListener('click', () => {
 });
 
 window.addEventListener('languageChanged', () => {
+    if (isSinglePlayer) {
+        UIManager.actualizarIndicadorTurno(null, turnoActual, true);
+        elements.opponentNameDisplay.textContent = `CPU (${t(aiDifficulty)})`;
+        return;
+    }
+
     if (currentDataSala && redFirebase.getRol()) {
         UIManager.actualizarIndicadorTurno(currentDataSala, redFirebase.getRol());
         if (checkGameOver() && !elements.modalOverlay.classList.contains('hidden')) {
@@ -58,11 +67,14 @@ function checkGameOver() {
 }
 
 async function salirAlLobby() {
-    await redFirebase.abandonarSala();
+    if (!isSinglePlayer) {
+        await redFirebase.abandonarSala();
+    }
     elements.gameWrapper.classList.add('hidden');
     elements.lobbyOverlay.classList.remove('hidden');
     elements.leaveBtn.classList.add('hidden');
     
+    isSinglePlayer = false;
     currentDataSala = null;
     turnoActual = 'jugador1';
     game.dadoActual = 0;
@@ -78,6 +90,7 @@ elements.leaveBtn.addEventListener('click', async () => {
 });
 
 function reaccionarCambioServidor(dataSala, miRol) {
+    if (isSinglePlayer) return;
     if (!dataSala) {
         alert(t('roomClosedMessage'));
         salirAlLobby();
@@ -114,31 +127,96 @@ function reaccionarCambioServidor(dataSala, miRol) {
     }
 }
 
+async function ejecutarTurnoIA() {
+    if (!isSinglePlayer || turnoActual !== 'jugador2') return;
+
+    UIManager.actualizarIndicadorTurno(null, 'jugador2', true, true);
+    
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // 1. Lanzar Dado
+    game.dadoActual = Math.floor(Math.random() * 6) + 1;
+    UIManager.actualizarEstadoDados(game.dadoActual, 'jugador2', 'jugador1', false);
+    
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // 2. IA elige movimiento
+    const colIdx = ai.suggestMove(game.tableroJugador, game.tableroOponente, game.dadoActual, aiDifficulty);
+    
+    // 3. Ejecutar movimiento
+    game.colocarDado(colIdx, false); // false = es Oponente
+    
+    turnoActual = 'jugador1';
+    UIManager.renderTableros(game);
+    UIManager.actualizarPuntos(game);
+    UIManager.actualizarEstadoDados(0, turnoActual, 'jugador1', false);
+    UIManager.actualizarIndicadorTurno(null, 'jugador1', true);
+    
+    if (checkGameOver()) {
+        const pJugador = parseInt(elements.playerTotalScore.textContent);
+        const pOponente = parseInt(elements.opponentTotalScore.textContent);
+        UIManager.mostrarModalFinal(pJugador, pOponente);
+    }
+}
+
 elements.rollBtn.addEventListener('click', async () => {
-    let miRol = redFirebase.getRol();
+    let miRol = isSinglePlayer ? 'jugador1' : redFirebase.getRol();
     if (elements.rollBtn.disabled || turnoActual !== miRol || game.dadoActual !== 0) return;
     
     const valorDado = Math.floor(Math.random() * 6) + 1;
-    await redFirebase.enviarDado(valorDado);
+    
+    if (isSinglePlayer) {
+        game.dadoActual = valorDado;
+        UIManager.actualizarEstadoDados(game.dadoActual, turnoActual, 'jugador1', false);
+    } else {
+        await redFirebase.enviarDado(valorDado);
+    }
 });
 
 for (let i = 0; i < 3; i++) {
     const playerCol = document.getElementById(`player-col-${i}`);
     playerCol.addEventListener('click', async () => {
-        let miRol = redFirebase.getRol();
+        let miRol = isSinglePlayer ? 'jugador1' : redFirebase.getRol();
         if (turnoActual !== miRol || game.dadoActual === 0) return;
 
         const movValido = game.colocarDado(i, true);
         if (movValido) {
-            let nuevoTurno = miRol === 'jugador1' ? 'jugador2' : 'jugador1';
-            await redFirebase.enviarMovimiento(game.tableroJugador, game.tableroOponente, nuevoTurno);
+            if (isSinglePlayer) {
+                turnoActual = 'jugador2';
+                UIManager.renderTableros(game);
+                UIManager.actualizarPuntos(game);
+                UIManager.actualizarEstadoDados(0, turnoActual, 'jugador1', false);
+                UIManager.actualizarIndicadorTurno(null, 'jugador1', true);
+                
+                if (checkGameOver()) {
+                    const pJugador = parseInt(elements.playerTotalScore.textContent);
+                    const pOponente = parseInt(elements.opponentTotalScore.textContent);
+                    UIManager.mostrarModalFinal(pJugador, pOponente);
+                } else {
+                    ejecutarTurnoIA();
+                }
+            } else {
+                let nuevoTurno = miRol === 'jugador1' ? 'jugador2' : 'jugador1';
+                await redFirebase.enviarMovimiento(game.tableroJugador, game.tableroOponente, nuevoTurno);
+            }
         }
     });
 }
 
 elements.restartBtn.addEventListener('click', async () => {
     elements.modalOverlay.classList.add('hidden');
-    await redFirebase.reiniciarSala();
+    if (isSinglePlayer) {
+        game.tableroJugador = [[], [], []];
+        game.tableroOponente = [[], [], []];
+        game.dadoActual = 0;
+        turnoActual = 'jugador1';
+        UIManager.renderTableros(game);
+        UIManager.actualizarPuntos(game);
+        UIManager.actualizarEstadoDados(0, turnoActual, 'jugador1', false);
+        UIManager.actualizarIndicadorTurno(null, 'jugador1', true);
+    } else {
+        await redFirebase.reiniciarSala();
+    }
 });
 
 elements.loginGithubBtn.addEventListener('click', async () => {
@@ -215,17 +293,51 @@ elements.joinRoomBtn.addEventListener('click', async () => {
     }
 });
 
+// --- SINGLE PLAYER / AI ---
+elements.difficultyBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        elements.difficultyBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        aiDifficulty = btn.getAttribute('data-difficulty');
+    });
+});
+
+elements.startSinglePlayerBtn.addEventListener('click', () => {
+    isSinglePlayer = true;
+    elements.lobbyOverlay.classList.add('hidden');
+    elements.gameWrapper.classList.remove('hidden');
+    elements.leaveBtn.classList.remove('hidden');
+    
+    elements.playerNameDisplay.textContent = t('you');
+    elements.opponentNameDisplay.textContent = `CPU (${t(aiDifficulty)})`;
+    
+    turnoActual = 'jugador1';
+    game.tableroJugador = [[], [], []];
+    game.tableroOponente = [[], [], []];
+    game.dadoActual = 0;
+    UIManager.renderTableros(game);
+    UIManager.actualizarPuntos(game);
+    UIManager.actualizarEstadoDados(0, turnoActual, 'jugador1', false);
+    UIManager.actualizarIndicadorTurno(null, 'jugador1', true);
+});
+
 window.addEventListener('keydown', async (e) => {
     if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
     if (elements.gameWrapper.classList.contains('hidden')) return;
 
-    const miRol = redFirebase.getRol();
+    let miRol = isSinglePlayer ? 'jugador1' : redFirebase.getRol();
     
     if (e.code === 'Space') {
         if (elements.rollBtn.disabled || turnoActual !== miRol || game.dadoActual !== 0) return;
         e.preventDefault();
+        
         const valorDado = Math.floor(Math.random() * 6) + 1;
-        await redFirebase.enviarDado(valorDado);
+        if (isSinglePlayer) {
+            game.dadoActual = valorDado;
+            UIManager.actualizarEstadoDados(game.dadoActual, turnoActual, 'jugador1', false);
+        } else {
+            await redFirebase.enviarDado(valorDado);
+        }
     }
     
     if (['1', '2', '3'].includes(e.key)) {
@@ -234,8 +346,24 @@ window.addEventListener('keydown', async (e) => {
         const colIndex = parseInt(e.key) - 1;
         const movValido = game.colocarDado(colIndex, true);
         if (movValido) {
-            const nuevoTurno = miRol === 'jugador1' ? 'jugador2' : 'jugador1';
-            await redFirebase.enviarMovimiento(game.tableroJugador, game.tableroOponente, nuevoTurno);
+            if (isSinglePlayer) {
+                turnoActual = 'jugador2';
+                UIManager.renderTableros(game);
+                UIManager.actualizarPuntos(game);
+                UIManager.actualizarEstadoDados(0, turnoActual, 'jugador1', false);
+                UIManager.actualizarIndicadorTurno(null, 'jugador1', true);
+                
+                if (checkGameOver()) {
+                    const pJugador = parseInt(elements.playerTotalScore.textContent);
+                    const pOponente = parseInt(elements.opponentTotalScore.textContent);
+                    UIManager.mostrarModalFinal(pJugador, pOponente);
+                } else {
+                    ejecutarTurnoIA();
+                }
+            } else {
+                const nuevoTurno = miRol === 'jugador1' ? 'jugador2' : 'jugador1';
+                await redFirebase.enviarMovimiento(game.tableroJugador, game.tableroOponente, nuevoTurno);
+            }
         }
     }
 });
@@ -252,7 +380,7 @@ redFirebase.observarEstadoSesion(async (user) => {
         redFirebase.limpiarSalasInactivas();
         
         const salaIdActual = await redFirebase.checkActiveSession();
-        if (salaIdActual) {
+        if (salaIdActual && !isSinglePlayer) {
             try {
                 await redFirebase.unirseASala(salaIdActual, shortName);
                 elements.lobbyOverlay.classList.add('hidden');
@@ -266,7 +394,7 @@ redFirebase.observarEstadoSesion(async (user) => {
                 elements.gameWrapper.classList.add('hidden');
                 elements.leaveBtn.classList.add('hidden');
             }
-        } else {
+        } else if (!isSinglePlayer) {
             elements.lobbyOverlay.classList.remove('hidden');
             elements.gameWrapper.classList.add('hidden');
             elements.leaveBtn.classList.add('hidden');

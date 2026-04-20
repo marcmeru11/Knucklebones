@@ -38,7 +38,15 @@ const translations = {
         waitingRival: "Waiting for opponent...",
         host: "Host",
         leaveRoom: "Leave Match",
-        roomClosedMessage: "The match was closed because a player left."
+        roomClosedMessage: "The match was closed because a player left.",
+        singlePlayer: "Single Player",
+        difficulty: "Difficulty",
+        easy: "Easy",
+        medium: "Medium",
+        hard: "Hard",
+        startSinglePlayerByDiff: "Level: ",
+        cpuThinking: "CPU is thinking...",
+        cpuTurn: "Turn: CPU"
     },
     es: {
         pageTitle: "Matatena",
@@ -79,7 +87,15 @@ const translations = {
         waitingRival: "Esperando rival...",
         host: "Host",
         leaveRoom: "Salir de Partida",
-        roomClosedMessage: "La partida se cerró porque un jugador se retiró."
+        roomClosedMessage: "La partida se cerró porque un jugador se retiró.",
+        singlePlayer: "Un jugador",
+        difficulty: "Dificultad",
+        easy: "Fácil",
+        medium: "Medio",
+        hard: "Difícil",
+        startSinglePlayerByDiff: "Nivel: ",
+        cpuThinking: "La CPU está pensando...",
+        cpuTurn: "Turno: CPU"
     }
 };
 
