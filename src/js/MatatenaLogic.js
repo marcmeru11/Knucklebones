@@ -28,26 +28,34 @@ class MatatenaLogic {
     }
 
     destruirDados(columnaIndex, numDado, esJugador) {
+        let tablero = esJugador ? this.tableroOponente[columnaIndex] : this.tableroJugador[columnaIndex];
+        let originalLength = tablero.length;
+        let nuevoTablero = tablero.filter(dado => dado !== numDado);
+        let destroyedCount = originalLength - nuevoTablero.length;
+
         if (esJugador) {
-            this.tableroOponente[columnaIndex] = this.tableroOponente[columnaIndex].filter(dado => dado !== numDado);
+            this.tableroOponente[columnaIndex] = nuevoTablero;
         } else {
-            this.tableroJugador[columnaIndex] = this.tableroJugador[columnaIndex].filter(dado => dado !== numDado);
+            this.tableroJugador[columnaIndex] = nuevoTablero;
         }
+
+        return destroyedCount;
     }
 
     colocarDado(columnaIndex, esJugador) {
         let tablero = esJugador ? this.tableroJugador : this.tableroOponente;
 
         if (tablero[columnaIndex].length >= 3 || this.dadoActual === 0) {
-            return false;
+            return { success: false, destroyedCount: 0 };
         }
 
         tablero[columnaIndex].push(this.dadoActual);
 
-        this.destruirDados(columnaIndex, this.dadoActual, esJugador);
+        const destroyedCount = this.destruirDados(columnaIndex, this.dadoActual, esJugador);
 
         this.dadoActual = 0;
         
-        return true;
+        return { success: true, destroyedCount };
     }
+
 }

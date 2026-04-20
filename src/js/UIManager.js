@@ -85,12 +85,17 @@ export const UIManager = {
         `;
     },
 
-    renderTableros(game) {
+    renderTableros(game, lastMove = null) {
         const { getDiceSVG } = this;
         
         game.tableroJugador.forEach((columna, colIndex) => {
             const slots = document.querySelectorAll(`#player-col-${colIndex} .dice-slot`);
-            slots.forEach(slot => { slot.innerHTML = ''; slot.classList.remove('filled', 'pop'); slot.style.borderColor = ''; slot.style.boxShadow = ''; });
+            slots.forEach(slot => { 
+                slot.innerHTML = ''; 
+                slot.classList.remove('filled', 'pop', 'impact'); 
+                slot.style.borderColor = ''; 
+                slot.style.boxShadow = ''; 
+            });
             
             const conteo = {};
             columna.forEach(d => conteo[d] = (conteo[d] || 0) + 1);
@@ -99,7 +104,14 @@ export const UIManager = {
                 if (slots[rowIndex]) {
                     const cantidad = conteo[dado];
                     slots[rowIndex].innerHTML = getDiceSVG(dado);
-                    slots[rowIndex].classList.add('filled', 'pop');
+                    slots[rowIndex].classList.add('filled');
+                    
+                    // Solo activar la animación si es el último dado puesto
+                    if (lastMove && lastMove.esJugador && lastMove.colIndex === colIndex && rowIndex === columna.length - 1) {
+                        slots[rowIndex].classList.add('impact');
+                    } else {
+                        slots[rowIndex].classList.add('pop');
+                    }
                     
                     if (cantidad === 3) {
                         slots[rowIndex].style.color = 'var(--clr-accent)';
@@ -117,7 +129,12 @@ export const UIManager = {
 
         game.tableroOponente.forEach((columna, colIndex) => {
             const slots = document.querySelectorAll(`#opp-col-${colIndex} .dice-slot`);
-            slots.forEach(slot => { slot.innerHTML = ''; slot.classList.remove('filled', 'pop'); slot.style.borderColor = ''; slot.style.boxShadow = ''; });
+            slots.forEach(slot => { 
+                slot.innerHTML = ''; 
+                slot.classList.remove('filled', 'pop', 'impact'); 
+                slot.style.borderColor = ''; 
+                slot.style.boxShadow = ''; 
+            });
             
             const conteo = {};
             columna.forEach(d => conteo[d] = (conteo[d] || 0) + 1);
@@ -126,7 +143,13 @@ export const UIManager = {
                 if (slots[rowIndex]) {
                     const cantidad = conteo[dado];
                     slots[rowIndex].innerHTML = getDiceSVG(dado);
-                    slots[rowIndex].classList.add('filled', 'pop');
+                    slots[rowIndex].classList.add('filled');
+
+                    if (lastMove && !lastMove.esJugador && lastMove.colIndex === colIndex && rowIndex === columna.length - 1) {
+                        slots[rowIndex].classList.add('impact');
+                    } else {
+                        slots[rowIndex].classList.add('pop');
+                    }
                     
                     if (cantidad === 3) {
                         slots[rowIndex].style.color = 'var(--clr-accent)';
@@ -230,13 +253,14 @@ export const UIManager = {
         const { dieValueSpan, currentDieContainer, rollBtn } = this.elements;
         if (dadoActual === 0) {
             dieValueSpan.innerHTML = '';
-            currentDieContainer.classList.remove('has-value');
+            currentDieContainer.classList.remove('has-value', 'rolling');
             dieValueSpan.style.color = '';
             currentDieContainer.style.borderColor = '';
             rollBtn.disabled = (turnoActual !== miRol) || faltaRival;
         } else {
             dieValueSpan.innerHTML = this.getDiceSVG(dadoActual);
             currentDieContainer.classList.add('has-value');
+            currentDieContainer.classList.remove('rolling');
             rollBtn.disabled = true;
             
             if (turnoActual === miRol) {
@@ -245,5 +269,85 @@ export const UIManager = {
                 dieValueSpan.style.color = '#d45b5b'; currentDieContainer.style.borderColor = '#d45b5b';
             }
         }
+    },
+
+    playRollAnimation(callback) {
+        const { dieValueSpan, currentDieContainer } = this.elements;
+        currentDieContainer.classList.add('rolling');
+        
+        let count = 0;
+        const interval = setInterval(() => {
+            const randomVal = Math.floor(Math.random() * 6) + 1;
+            dieValueSpan.innerHTML = this.getDiceSVG(randomVal);
+            count++;
+            if (count > 8) {
+                clearInterval(interval);
+                callback();
+            }
+        }, 50).unref?.() || null; // fallback for non-node environments though setInterval returns id
+    },
+
+    async animateElimination(colIndex, esJugadorAtacante, numDado) {
+        // esJugadorAtacante true -> ataca al oponente (tableroOponente)
+        // esJugadorAtacante false -> oponente ataca al jugador (tableroJugador)
+        const selectorPrefix = esJugadorAtacante ? '#opp-col-' : '#player-col-';
+        const colElement = document.querySelector(`${selectorPrefix}${colIndex}`);
+        const slots = colElement.querySelectorAll('.dice-slot');
+        
+        let found = false;
+        slots.forEach(slot => {
+            const svg = slot.querySelector('svg');
+            if (slot.classList.contains('filled') && svg) {
+                // Determine the value by looking for a specific pattern or just checking if it currently matches the logic
+                // In this UI, we don't store the value in the DOM easily, but we can check the SVG or just trust the logic
+                // For simplicity, we animate ALL dice in that column that will be removed.
+                // We'll rely on the caller to know if there's anything to animate.
+                // Actually, let's just animate all slots that CURRENTLY contain the value.
+                // Since this is called BEFORE renderTableros, the old dice are still there in the DOM.
+                
+                // Hacky way to check value: counting dots is hard, but we can pass the column model
+                // For now, let's just animate the slots that WILL BE empty after render.
+            }
+        });
+
+        // Simpler implementation: just flash the column red and animate the slots that have the value
+        colElement.classList.add('flash-red');
+        
+        // We look for slots that match the SVG of the value
+        const diceSVG = this.getDiceSVG(numDado);
+        slots.forEach(slot => {
+            if (slot.innerHTML.trim() === diceSVG.trim()) {
+                slot.classList.add('break');
+                found = true;
+            }
+        });
+
+        if (found) {
+            await new Promise(resolve => setTimeout(resolve, 400));
+        }
+        colElement.classList.remove('flash-red');
+    },
+
+    /**
+     * Triggers a screen shake effect when a triple elimination occurs.
+     */
+    shakeScreen() {
+        const { gameWrapper } = this.elements;
+        if (!gameWrapper) return;
+
+        gameWrapper.classList.remove('shake');
+        void gameWrapper.offsetWidth; // Force reflow
+        gameWrapper.classList.add('shake');
+
+        // Optional: Add haptic feedback if supported
+        if ('vibrate' in navigator) {
+            navigator.vibrate(200);
+        }
+
+        setTimeout(() => {
+            gameWrapper.classList.remove('shake');
+        }, 500);
     }
 };
+
+

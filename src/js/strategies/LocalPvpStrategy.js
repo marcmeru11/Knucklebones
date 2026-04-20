@@ -35,36 +35,30 @@ export class LocalPvpStrategy extends GameStrategy {
         // Any of the two players can roll if it's their turn and no die is active
         if (this.game.dadoActual !== 0) return;
         
-        this.game.dadoActual = Math.floor(Math.random() * 6) + 1;
-        
-        // We use 'jugador1' as the "active" visual POV for markers if needed, 
-        // but here it's just about showing the die for the current turn.
-        this.ui.actualizarEstadoDados(this.game.dadoActual, this.turnoActual, 'jugador1', false);
-        
-        // Update turn indicator to show who just rolled
-        this.ui.actualizarIndicadorTurno(null, this.turnoActual, true, false, true);
+        this.ui.playRollAnimation(() => {
+            this.game.dadoActual = Math.floor(Math.random() * 6) + 1;
+            this.ui.actualizarEstadoDados(this.game.dadoActual, this.turnoActual, 'jugador1', false);
+            this.ui.actualizarIndicadorTurno(null, this.turnoActual, true, false, true);
+        });
     }
 
     async place(colIndex) {
         if (this.game.dadoActual === 0) return;
 
-        // If it's Player 1's turn, they place in their board (isPlayer=true)
-        // If it's Player 2's turn, they place in the "opponent" board (isPlayer=false)
         const isPlayer1 = this.turnoActual === 'jugador1';
+        const diceValue = this.game.dadoActual;
+        const res = this.game.colocarDado(colIndex, isPlayer1);
         
-        // Important: in Local Strategy, "place(i, true)" always targets the bottom board.
-        // But for Player 2 (Top), we want to target the top board.
-        // However, the current MatatenaLogic.colocarDado(idx, isPlayer) logic:
-        // isPlayer=true -> targets tableroJugador
-        // isPlayer=false -> targets tableroOponente
-        
-        const movValido = this.game.colocarDado(colIndex, isPlayer1);
-        
-        if (movValido) {
+        if (res && res.success) {
+            if (res.destroyedCount > 0) {
+                await this.ui.animateElimination(colIndex, isPlayer1, diceValue);
+            }
+            if (res.destroyedCount === 3) this.ui.shakeScreen();
+
             // Switch turn
             this.turnoActual = (this.turnoActual === 'jugador1') ? 'jugador2' : 'jugador1';
             
-            this.ui.renderTableros(this.game);
+            this.ui.renderTableros(this.game, { colIndex, esJugador: isPlayer1 });
             this.ui.actualizarPuntos(this.game);
             this.ui.actualizarEstadoDados(0, this.turnoActual, 'jugador1', false);
             this.ui.actualizarIndicadorTurno(null, this.turnoActual, true, false, true);
@@ -74,6 +68,8 @@ export class LocalPvpStrategy extends GameStrategy {
             }
         }
     }
+
+
 
     finalizarPartida() {
         const p1Score = parseInt(this.ui.elements.playerTotalScore.textContent);

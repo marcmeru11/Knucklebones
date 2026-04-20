@@ -36,17 +36,25 @@ export class LocalStrategy extends GameStrategy {
     async roll() {
         if (this.turnoActual !== 'jugador1' || this.game.dadoActual !== 0) return;
         
-        this.game.dadoActual = Math.floor(Math.random() * 6) + 1;
-        this.ui.actualizarEstadoDados(this.game.dadoActual, this.turnoActual, 'jugador1', false);
+        this.ui.playRollAnimation(() => {
+            this.game.dadoActual = Math.floor(Math.random() * 6) + 1;
+            this.ui.actualizarEstadoDados(this.game.dadoActual, this.turnoActual, 'jugador1', false);
+        });
     }
 
     async place(colIndex) {
         if (this.turnoActual !== 'jugador1' || this.game.dadoActual === 0) return;
 
-        const movValido = this.game.colocarDado(colIndex, true);
-        if (movValido) {
+        const diceValue = this.game.dadoActual;
+        const res = this.game.colocarDado(colIndex, true);
+        if (res && res.success) {
+            if (res.destroyedCount > 0) {
+                await this.ui.animateElimination(colIndex, true, diceValue);
+            }
+            if (res.destroyedCount === 3) this.ui.shakeScreen();
+            
             this.turnoActual = 'jugador2';
-            this.ui.renderTableros(this.game);
+            this.ui.renderTableros(this.game, { colIndex, esJugador: true });
             this.ui.actualizarPuntos(this.game);
             this.ui.actualizarEstadoDados(0, this.turnoActual, 'jugador1', false);
             this.ui.actualizarIndicadorTurno(null, 'jugador1', true);
@@ -61,21 +69,37 @@ export class LocalStrategy extends GameStrategy {
 
     async ejecutarTurnoIA() {
         this.ui.actualizarIndicadorTurno(null, 'jugador2', true, true);
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 600));
         
-        this.game.dadoActual = Math.floor(Math.random() * 6) + 1;
-        this.ui.actualizarEstadoDados(this.game.dadoActual, 'jugador2', 'jugador1', false);
+        // IA Rolls with animation
+        await new Promise(resolve => {
+            this.ui.playRollAnimation(() => {
+                this.game.dadoActual = Math.floor(Math.random() * 6) + 1;
+                this.ui.actualizarEstadoDados(this.game.dadoActual, 'jugador2', 'jugador1', false);
+                resolve();
+            });
+        });
         
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 800));
         
         const colIdx = this.ai.suggestMove(this.game.tableroJugador, this.game.tableroOponente, this.game.dadoActual, this.difficulty);
-        this.game.colocarDado(colIdx, false);
+        const diceValueIA = this.game.dadoActual;
+        const resIA = this.game.colocarDado(colIdx, false);
         
-        this.turnoActual = 'jugador1';
-        this.ui.renderTableros(this.game);
-        this.ui.actualizarPuntos(this.game);
-        this.ui.actualizarEstadoDados(0, this.turnoActual, 'jugador1', false);
-        this.ui.actualizarIndicadorTurno(null, 'jugador1', true);
+        if (resIA && resIA.success) {
+            if (resIA.destroyedCount > 0) {
+                await this.ui.animateElimination(colIdx, false, diceValueIA);
+            }
+            if (resIA.destroyedCount === 3) this.ui.shakeScreen();
+
+            this.turnoActual = 'jugador1';
+            this.ui.renderTableros(this.game, { colIndex: colIdx, esJugador: false });
+            this.ui.actualizarPuntos(this.game);
+            this.ui.actualizarEstadoDados(0, this.turnoActual, 'jugador1', false);
+            this.ui.actualizarIndicadorTurno(null, 'jugador1', true);
+        }
+
+
         
         if (this.checkGameOver()) {
             this.finalizarPartida();
