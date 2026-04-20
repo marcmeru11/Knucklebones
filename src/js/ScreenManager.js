@@ -58,13 +58,13 @@ export const ScreenManager = {
             }
         }
 
-        // --- GITHUB LINK VISIBILITY ---
-        const githubLink = document.getElementById('github-link');
-        if (githubLink) {
+        // --- FLOATING LINKS VISIBILITY ---
+        const floatingLinks = document.getElementById('floating-links');
+        if (floatingLinks) {
             if (screenKey === 'game-wrapper') {
-                githubLink.classList.add('hidden');
+                floatingLinks.classList.add('hidden');
             } else {
-                githubLink.classList.remove('hidden');
+                floatingLinks.classList.remove('hidden');
             }
         }
     },

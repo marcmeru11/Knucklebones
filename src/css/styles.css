@@ -690,12 +690,18 @@ body {
   color: var(--clr-text);
 }
 
-/* ── GitHub link ────────────────────────────────────────── */
-.github-link {
+/* ── Floating Links ────────────────────────────────────── */
+.floating-links {
   position: fixed;
   bottom: 20px;
   right: 20px;
   z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.floating-link {
   width: 46px;
   height: 46px;
   background: rgba(22, 22, 31, 0.8);
@@ -711,7 +717,7 @@ body {
   text-decoration: none;
 }
 
-.github-link:hover {
+.floating-link:hover {
   background: var(--clr-surface-3);
   color: var(--clr-player);
   border-color: var(--clr-player);
@@ -719,12 +725,12 @@ body {
   transform: translateY(-3px) scale(1.1);
 }
 
-.github-link svg {
+.floating-link svg {
   width: 24px;
   height: 24px;
 }
 
-.github-link.hidden {
+.floating-links.hidden {
   display: none !important;
 }
 

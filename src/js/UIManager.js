@@ -46,7 +46,7 @@ export const UIManager = {
             aiOverlay: document.getElementById('ai-overlay'),
             lobbyBackBtn: document.getElementById('lobby-back-btn'),
             aiBackBtn: document.getElementById('ai-back-btn'),
-            githubLink: document.getElementById('github-link')
+            floatingLinks: document.getElementById('floating-links')
         };
 
         // Verification
