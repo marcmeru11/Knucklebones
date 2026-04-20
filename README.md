@@ -1,55 +1,104 @@
-# Knucklebones
+<div align="center">
 
-![Knucklebones Banner](https://img.shields.io/badge/Cult_of_the_Lamb-Fan_Game-crimson?style=for-the-badge)
+  # 🎲 Knucklebones
 
-**Knucklebones** is a high-fidelity web implementation of the "Knucklebones" minigame from *Cult of the Lamb*. It is a strategic dice-rolling game that blends luck with tactical placement, offering a polished, dark-themed aesthetic and various game modes.
+  *A high-fidelity web implementation of the Cult of the Lamb minigame.*
 
-## 🎮 How to Play
+  ![Cult of the Lamb Fan Game](https://img.shields.io/badge/Cult_of_the_Lamb-Fan_Game-crimson?style=for-the-badge)
+  ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+  ![Firebase](https://img.shields.io/badge/firebase-ffca28?style=for-the-badge&logo=firebase&logoColor=black)
+  ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+  ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
 
-The objective is to achieve a higher score than your opponent. The game ends as soon as one player fills their 3x3 grid.
+  **[🕹️ Play Live Demo](https://marcmeru.dev/Knucklebones/) • [🐛 Report Bug](https://github.com/marcmeru11/Knucklebones/issues) • [💡 Request Feature](https://github.com/marcmeru11/Knucklebones/issues)**
 
-### The Mechanics
-1. **Roll the Die:** On your turn, roll a standard 6-sided die.
-2. **Place your Die:** Choose one of the three columns on your board to place the die.
-3. **Multipliers:** If you place a die in a column that already contains a die of the same value, their scores are multiplied.
-   - **Double:** Two dice of the same value result in `(Value + Value) x 2`.
-   - **Triple:** Three dice of the same value result in `(Value + Value + Value) x 3`.
-4. **Destroy Opponent Dice:** Placing a die in a column will **destroy** all dice of that same value in your opponent's corresponding column. Use this to sabotage their highest-scoring columns!
-
-## 🚀 Features
-
-- **Single Player:** Battle against a smart AI with multiple difficulty levels (Easy, Medium, Hard).
-- **Local PvP:** Play against a friend on the same machine.
-- **Online Multiplayer:** Powered by **Firebase Realtime Database**, join or create private rooms to play globally.
-- **Modern UI:** Premium aesthetics featuring:
-  - Dark-mode design with glowing accents.
-  - Smooth glassmorphism effects.
-  - Interactive micro-animations for dice and buttons.
-  - Dynamic score calculation.
-- **Multilingual Support:** Available in **English** and **Spanish**.
-
-## 🛠️ Tech Stack
-
-- **Frontend:** Vanilla HTML5, CSS3 (Modern features like CSS Variables, Grid, and Flexbox), and JavaScript (ES6+).
-- **Backend:** Firebase (Authentication & Realtime Database).
-- **Icons:** Custom SVG icons for a consistent premium feel.
-
-## 📦 Getting Started
-
-Since this is a vanilla JavaScript project, no complex installation is required.
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/marcmeru11/Knucklebones.git
-   ```
-2. Open `index.html` in your favorite web browser.
-3. *Note: Firebase features require a valid configuration. If you are deploying your own version, ensure you update the Firebase settings in `src/js/FirebaseService.js`.*
-
-## 📜 Credits
-
-- Inspired by the minigame from **Cult of the Lamb** (Massive Monster / Devolver Digital).
-- Created as a fan project for educational and entertainment purposes.
+</div>
 
 ---
 
-*“A game of chance... and consequence.”*
+**Knucklebones** is a high-fidelity web implementation of the popular minigame from *Cult of the Lamb*. It is a strategic dice-rolling game that blends luck with tactical placement, offering a polished, dark-themed aesthetic and multiple ways to play.
+
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li><a href="#-gameplay-preview">Gameplay Preview</a></li>
+    <li><a href="#-how-to-play">How to Play</a></li>
+    <li><a href="#-features">Features</a></li>
+    <li><a href="#-tech-stack">Tech Stack</a></li>
+    <li><a href="#-getting-started">Getting Started</a></li>
+    <li><a href="#-credits">Credits</a></li>
+  </ol>
+</details>
+
+## Gameplay Preview
+
+
+<img src="etc/readme-image-1.png" alt="Gameplay Preview" width="600">
+
+## How to Play
+
+The objective is simple: **achieve a higher score than your opponent**. The game ends immediately as soon as one player completely fills their 3x3 grid.
+
+> [!TIP]
+> You can use "Spacebar" to roll the dice and "1", "2", or "3" to place the die in the corresponding column.
+
+
+### Core Mechanics
+
+1. **Roll the Die:** On your turn, roll a standard 6-sided die.
+2. **Place your Die:** Choose one of the three columns on your board to place the die.
+3. **Destroy Opponent Dice:** Placing a die in a column will **destroy** all dice of that exact same value in your opponent's corresponding column. Use this tactically to sabotage their score!
+
+### The Multipliers
+If you place a die in a column that already contains a die of the same value, their scores are multiplied:
+
+| Combination | Math | Example (Rolling a 4) | Total Score |
+| :--- | :--- | :--- | :--- |
+| **Single** | `Value` | `4` | **4** |
+| **Double** | `(Value + Value) x 2` | `(4 + 4) x 2` | **16** |
+| **Triple** | `(Value + Value + Value) x 3` | `(4 + 4 + 4) x 3` | **36** |
+
+## Features
+
+- **Single Player:** Battle against a smart AI with multiple difficulty levels (Easy, Medium, Hard).
+- **Local PvP:** Play against a friend on the same device.
+- **Online Multiplayer:** Powered by **Firebase**, join or create private rooms to play globally in real-time.
+- **Modern & Premium UI:** - Dark-mode design with crimson glowing accents.
+  - Smooth glassmorphism effects and dynamic score calculations.
+  - Interactive micro-animations for dice rolls and button hovers.
+- **Multilingual Support:** Fully localized in **English** and **Spanish**.
+
+## Tech Stack
+
+This project is built to be lightweight and fast, without relying on heavy frontend frameworks.
+
+- **Frontend:** Vanilla HTML5, CSS3 (CSS Variables, Grid, Flexbox), and JavaScript (ES6+).
+- **Backend/Database:** Firebase Authentication & Firebase Realtime Database.
+- **Assets:** Custom SVG icons for a crisp, consistent visual identity.
+
+## Getting Started
+
+Since this is a vanilla JavaScript project, no complex `npm` installation is required to run the local modes.
+
+### Local Setup
+1. Clone the repository:
+   ```bash
+   git clone [https://github.com/marcmeru11/Knucklebones.git](https://github.com/marcmeru11/Knucklebones.git)
+
+2. Navigate to the project folder:
+   ```bash
+   cd Knucklebones
+   ```
+3. Open `index.html` in your favorite web browser, or use an extension like VS Code's *Live Server*.
+
+> [!IMPORTANT]
+> Firebase authentication is enabled by default. If you are forking this repo to deploy your own version, you will need to change the code to use your own Firebase project.
+
+### Firebase Configuration (For Online Multiplayer and authentication)
+If you are forking this repo to deploy your own version, you will need your own Firebase project:
+1. Create a project in [Firebase](https://firebase.google.com/).
+2. Enable **Realtime Database** and **Anonymous Authentication**.
+3. Copy your config object and update the settings inside `src/js/FirebaseService.js` (or your config file).
+
+> [!WARNING]
+> Fierebase Realtime Database rules are highly recommended to be updated to prevent unauthorized access to your database.
