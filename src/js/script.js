@@ -399,6 +399,30 @@ joinRoomBtn.addEventListener('click', async () => {
         alert(t('errorFirebase') + error.message);
     }
 });
+window.addEventListener('keydown', async (e) => {
+    if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
+    if (gameWrapper.classList.contains('hidden')) return;
+
+    const miRol = redFirebase.getRol();
+    
+    if (e.code === 'Space') {
+        if (rollBtn.disabled || turnoActual !== miRol || game.dadoActual !== 0) return;
+        e.preventDefault();
+        const valorDado = Math.floor(Math.random() * 6) + 1;
+        await redFirebase.enviarDado(valorDado);
+    }
+    
+    if (['1', '2', '3'].includes(e.key)) {
+        if (turnoActual !== miRol || game.dadoActual === 0) return;
+        
+        const colIndex = parseInt(e.key) - 1;
+        const movValido = game.colocarDado(colIndex, true);
+        if (movValido) {
+            const nuevoTurno = miRol === 'jugador1' ? 'jugador2' : 'jugador1';
+            await redFirebase.enviarMovimiento(game.tableroJugador, game.tableroOponente, nuevoTurno);
+        }
+    }
+});
 
 redFirebase.observarEstadoSesion(async (user) => {
     if (user) {
