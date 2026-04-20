@@ -18,12 +18,16 @@ export const ScreenManager = {
      * @param {string} screenKey - The ID of the screen to show.
      */
     showScreen(screenKey) {
+        console.log(`ScreenManager: Transitioning to -> ${screenKey}`);
         // Overlays are mutual exclusive, except for game-over-modal which is on top of game-wrapper
         const isGameActive = screenKey === 'game-wrapper' || screenKey === 'game-over-modal' || screenKey === 'loading';
 
         this.screens.forEach(id => {
             const el = document.getElementById(id);
-            if (!el) return;
+            if (!el) {
+                console.warn(`ScreenManager: Screen ID not found -> ${id}`);
+                return;
+            }
 
             if (id === screenKey) {
                 el.classList.remove('hidden');

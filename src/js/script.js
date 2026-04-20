@@ -1,7 +1,9 @@
-import { redFirebase } from './FirebaseService.js?v=3';
-import { setLanguage, t } from './i18n.js?v=3';
-import { UIManager } from './UIManager.js?v=3';
-import { ScreenManager } from './ScreenManager.js?v=3';
+import { redFirebase } from './FirebaseService.js?v=4';
+import { setLanguage, t } from './i18n.js?v=4';
+import { UIManager } from './UIManager.js?v=4';
+import { ScreenManager } from './ScreenManager.js?v=4';
+
+UIManager.init();
 
 const game = new MatatenaLogic();
 const ai = new MatatenaAI();
