@@ -45,7 +45,26 @@
     </div>
   </div>
 
-  <!-- PANTALLA DE LOBBY / SALAS -->
+  <!-- PANTALLA DE SELECCIÓN DE MODO -->
+  <div id="mode-selection-overlay" class="modal-overlay hidden">
+    <div class="modal-content">
+      <h2 class="winner-title" style="font-size: 2rem; margin-bottom: 30px;" data-i18n="selectMode">Select Game Mode</h2>
+      
+      <div style="display:flex; flex-direction:column; gap: 15px;">
+          <button id="mode-online-btn" class="roll-btn restart-btn" style="border-color: #5b8fd4; background: linear-gradient(135deg, #5b8fd4 0%, #305f9e 100%); color: #fff;">
+            <span class="roll-btn-text" data-i18n="onlineMode">Online Multiplayer</span>
+            <span class="roll-btn-shine"></span>
+          </button>
+          
+          <button id="mode-cpu-btn" class="roll-btn restart-btn" style="border-color: #d4a05b; background: linear-gradient(135deg, #d4a05b 0%, #a67537 100%); color: #fff;">
+            <span class="roll-btn-text" data-i18n="cpuMode">Player vs CPU</span>
+            <span class="roll-btn-shine"></span>
+          </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANTALLA DE LOBBY / SALAS (MULTIJUGADOR) -->
   <div id="lobby-overlay" class="modal-overlay hidden">
     <div class="modal-content">
       <h2 class="winner-title" style="font-size: 2rem; margin-bottom: 25px;" data-i18n="multiplayer">Multiplayer</h2>
@@ -64,23 +83,32 @@
             <span class="roll-btn-text" data-i18n="joinRoom">Join Room</span>
             <span class="roll-btn-shine"></span>
           </button>
-      </div>
 
-      <hr style="opacity: 0.1; margin: 25px 0;">
+          <button id="lobby-back-btn" class="logout-btn" style="width: 100%; margin-top: 10px; background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1);" data-i18n="back">Back</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANTALLA DE AJUSTES IA (SINGLE PLAYER) -->
+  <div id="ai-overlay" class="modal-overlay hidden">
+    <div class="modal-content">
+      <h2 class="winner-title" style="font-size: 2rem; margin-bottom: 25px;" data-i18n="singlePlayer">Single Player</h2>
       
-      <h2 class="winner-title" style="font-size: 1.5rem; margin-bottom: 20px;" data-i18n="singlePlayer">Single Player</h2>
+      <p class="winner-score" style="text-transform: none; font-size: 0.85rem; letter-spacing: normal; margin-bottom: 20px;" data-i18n="difficulty">Difficulty</p>
       
       <div style="display:flex; flex-direction:column; gap: 12px;">
-          <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 5px;" id="difficulty-selector">
+          <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 10px;" id="difficulty-selector">
             <button class="lang-btn difficulty-btn active" data-difficulty="easy" data-i18n="easy">Easy</button>
             <button class="lang-btn difficulty-btn" data-difficulty="medium" data-i18n="medium">Medium</button>
             <button class="lang-btn difficulty-btn" data-difficulty="hard" data-i18n="hard">Hard</button>
           </div>
           
           <button id="start-single-player-btn" class="roll-btn restart-btn" style="border-color: #d4a05b; background: linear-gradient(135deg, #d4a05b 0%, #a67537 100%); color: #fff;">
-            <span class="roll-btn-text" data-i18n="playAgain">Start Game</span>
+            <span class="roll-btn-text" data-i18n="startSinglePlayer">Start Game</span>
             <span class="roll-btn-shine"></span>
           </button>
+
+          <button id="ai-back-btn" class="logout-btn" style="width: 100%; margin-top: 10px; background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1);" data-i18n="back">Back</button>
       </div>
     </div>
   </div>

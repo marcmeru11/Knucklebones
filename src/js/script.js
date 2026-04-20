@@ -71,7 +71,9 @@ async function salirAlLobby() {
         await redFirebase.abandonarSala();
     }
     elements.gameWrapper.classList.add('hidden');
-    elements.lobbyOverlay.classList.remove('hidden');
+    elements.modeSelectionOverlay.classList.remove('hidden');
+    elements.lobbyOverlay.classList.add('hidden');
+    elements.aiOverlay.classList.add('hidden');
     elements.leaveBtn.classList.add('hidden');
     
     isSinglePlayer = false;
@@ -304,7 +306,7 @@ elements.difficultyBtns.forEach(btn => {
 
 elements.startSinglePlayerBtn.addEventListener('click', () => {
     isSinglePlayer = true;
-    elements.lobbyOverlay.classList.add('hidden');
+    elements.aiOverlay.classList.add('hidden');
     elements.gameWrapper.classList.remove('hidden');
     elements.leaveBtn.classList.remove('hidden');
     
@@ -319,6 +321,27 @@ elements.startSinglePlayerBtn.addEventListener('click', () => {
     UIManager.actualizarPuntos(game);
     UIManager.actualizarEstadoDados(0, turnoActual, 'jugador1', false);
     UIManager.actualizarIndicadorTurno(null, 'jugador1', true);
+});
+
+// --- NAVIGATION ---
+elements.modeOnlineBtn.addEventListener('click', () => {
+    elements.modeSelectionOverlay.classList.add('hidden');
+    elements.lobbyOverlay.classList.remove('hidden');
+});
+
+elements.modeCpuBtn.addEventListener('click', () => {
+    elements.modeSelectionOverlay.classList.add('hidden');
+    elements.aiOverlay.classList.remove('hidden');
+});
+
+elements.lobbyBackBtn.addEventListener('click', () => {
+    elements.lobbyOverlay.classList.add('hidden');
+    elements.modeSelectionOverlay.classList.remove('hidden');
+});
+
+elements.aiBackBtn.addEventListener('click', () => {
+    elements.aiOverlay.classList.add('hidden');
+    elements.modeSelectionOverlay.classList.remove('hidden');
 });
 
 window.addEventListener('keydown', async (e) => {
@@ -383,26 +406,34 @@ redFirebase.observarEstadoSesion(async (user) => {
         if (salaIdActual && !isSinglePlayer) {
             try {
                 await redFirebase.unirseASala(salaIdActual, shortName);
+                elements.modeSelectionOverlay.classList.add('hidden');
                 elements.lobbyOverlay.classList.add('hidden');
+                elements.aiOverlay.classList.add('hidden');
                 elements.gameWrapper.classList.remove('hidden');
                 elements.leaveBtn.classList.remove('hidden');
                 redFirebase.escucharCambiosSala(reaccionarCambioServidor);
             } catch (error) {
                 console.error("Room missing or expired", error);
                 await redFirebase.clearActiveSession();
-                elements.lobbyOverlay.classList.remove('hidden');
+                elements.modeSelectionOverlay.classList.remove('hidden');
+                elements.lobbyOverlay.classList.add('hidden');
+                elements.aiOverlay.classList.add('hidden');
                 elements.gameWrapper.classList.add('hidden');
                 elements.leaveBtn.classList.add('hidden');
             }
         } else if (!isSinglePlayer) {
-            elements.lobbyOverlay.classList.remove('hidden');
+            elements.modeSelectionOverlay.classList.remove('hidden');
+            elements.lobbyOverlay.classList.add('hidden');
+            elements.aiOverlay.classList.add('hidden');
             elements.gameWrapper.classList.add('hidden');
             elements.leaveBtn.classList.add('hidden');
         }
     } else {
         elements.loginOverlay.classList.remove('hidden');
         elements.topNav.classList.add('hidden');
+        elements.modeSelectionOverlay.classList.add('hidden');
         elements.lobbyOverlay.classList.add('hidden');
+        elements.aiOverlay.classList.add('hidden');
         elements.gameWrapper.classList.add('hidden');
         elements.leaveBtn.classList.add('hidden');
     }

@@ -30,7 +30,13 @@ export const UIManager = {
         langEnBtn: document.getElementById('lang-en'),
         langEsBtn: document.getElementById('lang-es'),
         startSinglePlayerBtn: document.getElementById('start-single-player-btn'),
-        difficultyBtns: document.querySelectorAll('.difficulty-btn')
+        difficultyBtns: document.querySelectorAll('.difficulty-btn'),
+        modeSelectionOverlay: document.getElementById('mode-selection-overlay'),
+        modeOnlineBtn: document.getElementById('mode-online-btn'),
+        modeCpuBtn: document.getElementById('mode-cpu-btn'),
+        aiOverlay: document.getElementById('ai-overlay'),
+        lobbyBackBtn: document.getElementById('lobby-back-btn'),
+        aiBackBtn: document.getElementById('ai-back-btn')
     },
 
     getDiceSVG(valor) {
