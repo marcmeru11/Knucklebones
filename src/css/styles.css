@@ -690,3 +690,41 @@ body {
   color: var(--clr-text);
 }
 
+/* ── GitHub link ────────────────────────────────────────── */
+.github-link {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 2000;
+  width: 46px;
+  height: 46px;
+  background: rgba(22, 22, 31, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--clr-border-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--clr-text-muted);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  transition: all var(--transition-normal);
+  text-decoration: none;
+}
+
+.github-link:hover {
+  background: var(--clr-surface-3);
+  color: var(--clr-player);
+  border-color: var(--clr-player);
+  box-shadow: 0 0 15px var(--clr-player-glow);
+  transform: translateY(-3px) scale(1.1);
+}
+
+.github-link svg {
+  width: 24px;
+  height: 24px;
+}
+
+.github-link.hidden {
+  display: none !important;
+}
+

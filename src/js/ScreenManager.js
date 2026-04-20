@@ -57,6 +57,16 @@ export const ScreenManager = {
                 if (leaveBtn) leaveBtn.classList.add('hidden');
             }
         }
+
+        // --- GITHUB LINK VISIBILITY ---
+        const githubLink = document.getElementById('github-link');
+        if (githubLink) {
+            if (screenKey === 'game-wrapper') {
+                githubLink.classList.add('hidden');
+            } else {
+                githubLink.classList.remove('hidden');
+            }
+        }
     },
 
     /**

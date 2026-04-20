@@ -45,7 +45,8 @@ export const UIManager = {
             modeLocalPvpBtn: document.getElementById('mode-pvp-local-btn'),
             aiOverlay: document.getElementById('ai-overlay'),
             lobbyBackBtn: document.getElementById('lobby-back-btn'),
-            aiBackBtn: document.getElementById('ai-back-btn')
+            aiBackBtn: document.getElementById('ai-back-btn'),
+            githubLink: document.getElementById('github-link')
         };
 
         // Verification
