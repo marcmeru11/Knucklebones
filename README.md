@@ -18,6 +18,9 @@
 
 **Knucklebones** is a high-fidelity web implementation of the popular minigame from *Cult of the Lamb*. It is a strategic dice-rolling game that blends luck with tactical placement, offering a polished, dark-themed aesthetic and multiple ways to play.
 
+> [!CAUTION]
+> This is a fan-made project and is not affiliated with Massive Monster or Devolver Digital.
+
 <details>
   <summary>Table of Contents</summary>
   <ol>
