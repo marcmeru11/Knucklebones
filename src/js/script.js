@@ -1,10 +1,10 @@
-import { redFirebase } from './FirebaseService.js?v=4';
-import { setLanguage, t } from './i18n.js?v=4';
-import { UIManager } from './UIManager.js?v=4';
-import { ScreenManager } from './ScreenManager.js?v=4';
-import { LocalStrategy } from './strategies/LocalStrategy.js?v=4';
-import { OnlineStrategy } from './strategies/OnlineStrategy.js?v=4';
-import { LocalPvpStrategy } from './strategies/LocalPvpStrategy.js?v=4';
+import { redFirebase } from './FirebaseService.js?v=5';
+import { setLanguage, t } from './i18n.js?v=5';
+import { UIManager } from './UIManager.js?v=5';
+import { ScreenManager } from './ScreenManager.js?v=5';
+import { LocalStrategy } from './strategies/LocalStrategy.js?v=5';
+import { OnlineStrategy } from './strategies/OnlineStrategy.js?v=5';
+import { LocalPvpStrategy } from './strategies/LocalPvpStrategy.js?v=5';
 
 UIManager.init();
 
@@ -144,6 +144,7 @@ elements.startSinglePlayerBtn.addEventListener('click', async () => {
 });
 
 elements.modeLocalPvpBtn.addEventListener('click', async () => {
+    console.log("Local PVP button clicked!");
     currentStrategy = new LocalPvpStrategy(game, UIManager);
     await currentStrategy.init({});
 });

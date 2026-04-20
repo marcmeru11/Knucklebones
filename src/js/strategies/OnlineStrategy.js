@@ -1,7 +1,7 @@
-import { GameStrategy } from './GameStrategy.js?v=4';
-import { redFirebase } from '../FirebaseService.js?v=4';
-import { t } from '../i18n.js?v=4';
-import { ScreenManager } from '../ScreenManager.js?v=4';
+import { GameStrategy } from './GameStrategy.js?v=5';
+import { redFirebase } from '../FirebaseService.js?v=5';
+import { t } from '../i18n.js?v=5';
+import { ScreenManager } from '../ScreenManager.js?v=5';
 
 /**
  * OnlineStrategy.js

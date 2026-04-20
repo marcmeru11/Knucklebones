@@ -1,6 +1,6 @@
-import { GameStrategy } from './GameStrategy.js?v=4';
-import { t } from '../i18n.js?v=4';
-import { ScreenManager } from '../ScreenManager.js?v=4';
+import { GameStrategy } from './GameStrategy.js?v=5';
+import { t } from '../i18n.js?v=5';
+import { ScreenManager } from '../ScreenManager.js?v=5';
 
 /**
  * LocalPvpStrategy.js
@@ -26,7 +26,7 @@ export class LocalPvpStrategy extends GameStrategy {
         this.ui.renderTableros(this.game);
         this.ui.actualizarPuntos(this.game);
         this.ui.actualizarEstadoDados(0, this.turnoActual, 'jugador1', false);
-        this.ui.actualizarIndicadorTurno(null, 'jugador1', true);
+        this.ui.actualizarIndicadorTurno(null, this.turnoActual, true, false, true);
         
         ScreenManager.showScreen('game-wrapper');
     }
@@ -42,7 +42,7 @@ export class LocalPvpStrategy extends GameStrategy {
         this.ui.actualizarEstadoDados(this.game.dadoActual, this.turnoActual, 'jugador1', false);
         
         // Update turn indicator to show who just rolled
-        this.ui.actualizarIndicadorTurno(null, this.turnoActual, true);
+        this.ui.actualizarIndicadorTurno(null, this.turnoActual, true, false, true);
     }
 
     async place(colIndex) {
@@ -67,7 +67,7 @@ export class LocalPvpStrategy extends GameStrategy {
             this.ui.renderTableros(this.game);
             this.ui.actualizarPuntos(this.game);
             this.ui.actualizarEstadoDados(0, this.turnoActual, 'jugador1', false);
-            this.ui.actualizarIndicadorTurno(null, this.turnoActual, true);
+            this.ui.actualizarIndicadorTurno(null, this.turnoActual, true, false, true);
             
             if (this.checkGameOver()) {
                 this.finalizarPartida();

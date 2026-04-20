@@ -1,5 +1,5 @@
-import { t } from './i18n.js?v=3';
-import { ScreenManager } from './ScreenManager.js?v=3';
+import { t } from './i18n.js?v=5';
+import { ScreenManager } from './ScreenManager.js?v=5';
 
 export const UIManager = {
     // --- ELEMENTOS DOM ---
@@ -157,21 +157,29 @@ export const UIManager = {
         this.elements.opponentTotalScore.textContent = ptosTotalesOponente;
     },
 
-    actualizarIndicadorTurno(dataSala, miRol, isSinglePlayer = false, isCpuThinking = false) {
+    actualizarIndicadorTurno(dataSala, miRol, isLocal = false, isCpuThinking = false, isPvpLocal = false) {
         const { hintText } = this.elements;
         const rollBtnText = document.querySelector('.roll-btn-text');
 
-        if (isSinglePlayer) {
+        if (isLocal) {
+            if (isPvpLocal) {
+                const pName = (miRol === 'jugador1') ? t('player1') : t('player2');
+                const pColor = (miRol === 'jugador1') ? 'var(--clr-player)' : '#8f5bd4';
+                hintText.innerHTML = `${t('turnOpponent')}<strong style="color: ${pColor}">${pName.toUpperCase()}</strong>`;
+                rollBtnText.textContent = `${t('rollBtn')} (${pName.toUpperCase()})`;
+                return;
+            }
+
             if (isCpuThinking) {
                 hintText.innerHTML = `<strong style="color: #d45b5b">${t('cpuThinking')}</strong>`;
                 rollBtnText.textContent = t('rollWait');
                 return;
             }
 
-            if (miRol === 'jugador1') { // Turno del humano
+            if (miRol === 'jugador1') {
                 hintText.innerHTML = `<strong style="color: var(--clr-player)">${t('turnYou')}</strong>`;
                 rollBtnText.textContent = t('rollYou');
-            } else { // Turno de la CPU
+            } else {
                 hintText.innerHTML = `<strong style="color: #d45b5b">${t('cpuTurn')}</strong>`;
                 rollBtnText.textContent = t('rollWait');
             }
