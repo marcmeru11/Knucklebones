@@ -1,8 +1,8 @@
-# Matatena (Knucklebones)
+# Knucklebones
 
-![Matatena Banner](https://img.shields.io/badge/Cult_of_the_Lamb-Fan_Game-crimson?style=for-the-badge)
+![Knucklebones Banner](https://img.shields.io/badge/Cult_of_the_Lamb-Fan_Game-crimson?style=for-the-badge)
 
-**Matatena** is a high-fidelity web implementation of the "Knucklebones" minigame from *Cult of the Lamb*. It is a strategic dice-rolling game that blends luck with tactical placement, offering a polished, dark-themed aesthetic and various game modes.
+**Knucklebones** is a high-fidelity web implementation of the "Knucklebones" minigame from *Cult of the Lamb*. It is a strategic dice-rolling game that blends luck with tactical placement, offering a polished, dark-themed aesthetic and various game modes.
 
 ## 🎮 How to Play
 
