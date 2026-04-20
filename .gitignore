@@ -33,3 +33,6 @@ logs
 # Ocultar Firebase Cache
 .firebase/
 firebase-debug.log
+
+# Firebase Config
+src/js/firebase-config.js

@@ -1,4 +1,5 @@
 import { t } from './i18n.js?v=3';
+import { ScreenManager } from './ScreenManager.js?v=3';
 
 export const UIManager = {
     // --- ELEMENTOS DOM ---
@@ -197,7 +198,7 @@ export const UIManager = {
         }
         
         winnerScoreText.textContent = `${puntosJugador} a ${puntosOponente}`;
-        modalOverlay.classList.remove('hidden');
+        ScreenManager.showScreen('game-over-modal');
     },
 
     actualizarEstadoDados(dadoActual, turnoActual, miRol, faltaRival) {

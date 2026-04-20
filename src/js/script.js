@@ -1,6 +1,7 @@
 import { redFirebase } from './FirebaseService.js?v=3';
 import { setLanguage, t } from './i18n.js?v=3';
 import { UIManager } from './UIManager.js?v=3';
+import { ScreenManager } from './ScreenManager.js?v=3';
 
 const game = new MatatenaLogic();
 const ai = new MatatenaAI();
@@ -70,11 +71,7 @@ async function salirAlLobby() {
     if (!isSinglePlayer) {
         await redFirebase.abandonarSala();
     }
-    elements.gameWrapper.classList.add('hidden');
-    elements.modeSelectionOverlay.classList.remove('hidden');
-    elements.lobbyOverlay.classList.add('hidden');
-    elements.aiOverlay.classList.add('hidden');
-    elements.leaveBtn.classList.add('hidden');
+    ScreenManager.showScreen('mode-selection-overlay');
     
     isSinglePlayer = false;
     currentDataSala = null;
@@ -206,7 +203,6 @@ for (let i = 0; i < 3; i++) {
 }
 
 elements.restartBtn.addEventListener('click', async () => {
-    elements.modalOverlay.classList.add('hidden');
     if (isSinglePlayer) {
         game.tableroJugador = [[], [], []];
         game.tableroOponente = [[], [], []];
@@ -216,8 +212,10 @@ elements.restartBtn.addEventListener('click', async () => {
         UIManager.actualizarPuntos(game);
         UIManager.actualizarEstadoDados(0, turnoActual, 'jugador1', false);
         UIManager.actualizarIndicadorTurno(null, 'jugador1', true);
+        ScreenManager.showScreen('game-wrapper');
     } else {
         await redFirebase.reiniciarSala();
+        ScreenManager.showScreen('game-wrapper');
     }
 });
 
@@ -261,9 +259,7 @@ elements.createRoomBtn.addEventListener('click', async () => {
         await redFirebase.crearSala(code, elements.playerNameDisplay.textContent);
         
         elements.createRoomBtn.innerHTML = `<span class="roll-btn-text">${t('createRoom')}</span><span class="roll-btn-shine"></span>`;
-        elements.lobbyOverlay.classList.add('hidden');
-        elements.gameWrapper.classList.remove('hidden');
-        elements.leaveBtn.classList.remove('hidden');
+        ScreenManager.showScreen('game-wrapper');
         
         redFirebase.escucharCambiosSala(reaccionarCambioServidor);
     } catch (error) {
@@ -283,9 +279,7 @@ elements.joinRoomBtn.addEventListener('click', async () => {
         await redFirebase.unirseASala(code, elements.playerNameDisplay.textContent);
         
         elements.joinRoomBtn.innerHTML = `<span class="roll-btn-text">${t('joinRoom')}</span><span class="roll-btn-shine"></span>`;
-        elements.lobbyOverlay.classList.add('hidden');
-        elements.gameWrapper.classList.remove('hidden');
-        elements.leaveBtn.classList.remove('hidden');
+        ScreenManager.showScreen('game-wrapper');
         
         redFirebase.escucharCambiosSala(reaccionarCambioServidor);
     } catch (error) {
@@ -306,9 +300,7 @@ elements.difficultyBtns.forEach(btn => {
 
 elements.startSinglePlayerBtn.addEventListener('click', () => {
     isSinglePlayer = true;
-    elements.aiOverlay.classList.add('hidden');
-    elements.gameWrapper.classList.remove('hidden');
-    elements.leaveBtn.classList.remove('hidden');
+    ScreenManager.showScreen('game-wrapper');
     
     elements.playerNameDisplay.textContent = t('you');
     elements.opponentNameDisplay.textContent = `CPU (${t(aiDifficulty)})`;
@@ -325,23 +317,21 @@ elements.startSinglePlayerBtn.addEventListener('click', () => {
 
 // --- NAVIGATION ---
 elements.modeOnlineBtn.addEventListener('click', () => {
-    elements.modeSelectionOverlay.classList.add('hidden');
-    elements.lobbyOverlay.classList.remove('hidden');
+    ScreenManager.showScreen('lobby-overlay');
 });
 
 elements.modeCpuBtn.addEventListener('click', () => {
-    elements.modeSelectionOverlay.classList.add('hidden');
-    elements.aiOverlay.classList.remove('hidden');
+    ScreenManager.showScreen('ai-overlay');
 });
 
-elements.lobbyBackBtn.addEventListener('click', () => {
-    elements.lobbyOverlay.classList.add('hidden');
-    elements.modeSelectionOverlay.classList.remove('hidden');
+elements.lobbyBackBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    ScreenManager.showScreen('mode-selection-overlay');
 });
 
-elements.aiBackBtn.addEventListener('click', () => {
-    elements.aiOverlay.classList.add('hidden');
-    elements.modeSelectionOverlay.classList.remove('hidden');
+elements.aiBackBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    ScreenManager.showScreen('mode-selection-overlay');
 });
 
 window.addEventListener('keydown', async (e) => {
@@ -397,44 +387,23 @@ redFirebase.observarEstadoSesion(async (user) => {
         elements.playerNameDisplay.textContent = shortName;
         elements.loggedUserName.textContent = shortName;
         
-        elements.loginOverlay.classList.add('hidden');
-        elements.topNav.classList.remove('hidden');
-        
         redFirebase.limpiarSalasInactivas();
         
         const salaIdActual = await redFirebase.checkActiveSession();
         if (salaIdActual && !isSinglePlayer) {
             try {
                 await redFirebase.unirseASala(salaIdActual, shortName);
-                elements.modeSelectionOverlay.classList.add('hidden');
-                elements.lobbyOverlay.classList.add('hidden');
-                elements.aiOverlay.classList.add('hidden');
-                elements.gameWrapper.classList.remove('hidden');
-                elements.leaveBtn.classList.remove('hidden');
+                ScreenManager.showScreen('game-wrapper');
                 redFirebase.escucharCambiosSala(reaccionarCambioServidor);
             } catch (error) {
                 console.error("Room missing or expired", error);
                 await redFirebase.clearActiveSession();
-                elements.modeSelectionOverlay.classList.remove('hidden');
-                elements.lobbyOverlay.classList.add('hidden');
-                elements.aiOverlay.classList.add('hidden');
-                elements.gameWrapper.classList.add('hidden');
-                elements.leaveBtn.classList.add('hidden');
+                ScreenManager.showScreen('mode-selection-overlay');
             }
         } else if (!isSinglePlayer) {
-            elements.modeSelectionOverlay.classList.remove('hidden');
-            elements.lobbyOverlay.classList.add('hidden');
-            elements.aiOverlay.classList.add('hidden');
-            elements.gameWrapper.classList.add('hidden');
-            elements.leaveBtn.classList.add('hidden');
+            ScreenManager.showScreen('mode-selection-overlay');
         }
     } else {
-        elements.loginOverlay.classList.remove('hidden');
-        elements.topNav.classList.add('hidden');
-        elements.modeSelectionOverlay.classList.add('hidden');
-        elements.lobbyOverlay.classList.add('hidden');
-        elements.aiOverlay.classList.add('hidden');
-        elements.gameWrapper.classList.add('hidden');
-        elements.leaveBtn.classList.add('hidden');
+        ScreenManager.showScreen('login-overlay');
     }
 });
