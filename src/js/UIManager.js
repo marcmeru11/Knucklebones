@@ -3,41 +3,56 @@ import { ScreenManager } from './ScreenManager.js?v=3';
 
 export const UIManager = {
     // --- ELEMENTOS DOM ---
-    elements: {
-        rollBtn: document.getElementById('roll-btn'),
-        dieValueSpan: document.getElementById('die-value'),
-        currentDieContainer: document.getElementById('current-die'),
-        opponentTotalScore: document.getElementById('opponent-total-score'),
-        playerTotalScore: document.getElementById('player-total-score'),
-        hintText: document.getElementById('action-hint'),
-        modalOverlay: document.getElementById('game-over-modal'),
-        winnerTitle: document.getElementById('winner-title'),
-        winnerScoreText: document.getElementById('winner-score'),
-        restartBtn: document.getElementById('restart-btn'),
-        loginOverlay: document.getElementById('login-overlay'),
-        loginGithubBtn: document.getElementById('login-github-btn'),
-        loginGoogleBtn: document.getElementById('login-google-btn'),
-        lobbyOverlay: document.getElementById('lobby-overlay'),
-        topNav: document.getElementById('top-nav'),
-        loggedUserName: document.getElementById('logged-user-name'),
-        logoutBtn: document.getElementById('logout-btn'),
-        leaveBtn: document.getElementById('leave-btn'),
-        roomInput: document.getElementById('room-input'),
-        createRoomBtn: document.getElementById('create-room-btn'),
-        joinRoomBtn: document.getElementById('join-room-btn'),
-        gameWrapper: document.getElementById('game-wrapper'),
-        playerNameDisplay: document.getElementById('player-name-display'),
-        opponentNameDisplay: document.querySelector('.opponent-zone .player-name'),
-        langEnBtn: document.getElementById('lang-en'),
-        langEsBtn: document.getElementById('lang-es'),
-        startSinglePlayerBtn: document.getElementById('start-single-player-btn'),
-        difficultyBtns: document.querySelectorAll('.difficulty-btn'),
-        modeSelectionOverlay: document.getElementById('mode-selection-overlay'),
-        modeOnlineBtn: document.getElementById('mode-online-btn'),
-        modeCpuBtn: document.getElementById('mode-cpu-btn'),
-        aiOverlay: document.getElementById('ai-overlay'),
-        lobbyBackBtn: document.getElementById('lobby-back-btn'),
-        aiBackBtn: document.getElementById('ai-back-btn')
+    elements: {},
+
+    /**
+     * Initializes DOM references AFTER the DOM is ready.
+     */
+    init() {
+        console.log("UIManager: Initializing elements...");
+        this.elements = {
+            rollBtn: document.getElementById('roll-btn'),
+            dieValueSpan: document.getElementById('die-value'),
+            currentDieContainer: document.getElementById('current-die'),
+            opponentTotalScore: document.getElementById('opponent-total-score'),
+            playerTotalScore: document.getElementById('player-total-score'),
+            hintText: document.getElementById('action-hint'),
+            modalOverlay: document.getElementById('game-over-modal'),
+            winnerTitle: document.getElementById('winner-title'),
+            winnerScoreText: document.getElementById('winner-score'),
+            restartBtn: document.getElementById('restart-btn'),
+            loginOverlay: document.getElementById('login-overlay'),
+            loginGithubBtn: document.getElementById('login-github-btn'),
+            loginGoogleBtn: document.getElementById('login-google-btn'),
+            lobbyOverlay: document.getElementById('lobby-overlay'),
+            topNav: document.getElementById('top-nav'),
+            loggedUserName: document.getElementById('logged-user-name'),
+            logoutBtn: document.getElementById('logout-btn'),
+            leaveBtn: document.getElementById('leave-btn'),
+            roomInput: document.getElementById('room-input'),
+            createRoomBtn: document.getElementById('create-room-btn'),
+            joinRoomBtn: document.getElementById('join-room-btn'),
+            gameWrapper: document.getElementById('game-wrapper'),
+            playerNameDisplay: document.getElementById('player-name-display'),
+            opponentNameDisplay: document.querySelector('.opponent-zone .player-name'),
+            langEnBtn: document.getElementById('lang-en'),
+            langEsBtn: document.getElementById('lang-es'),
+            startSinglePlayerBtn: document.getElementById('start-single-player-btn'),
+            difficultyBtns: document.querySelectorAll('.difficulty-btn'),
+            modeSelectionOverlay: document.getElementById('mode-selection-overlay'),
+            modeOnlineBtn: document.getElementById('mode-online-btn'),
+            modeCpuBtn: document.getElementById('mode-cpu-btn'),
+            aiOverlay: document.getElementById('ai-overlay'),
+            lobbyBackBtn: document.getElementById('lobby-back-btn'),
+            aiBackBtn: document.getElementById('ai-back-btn')
+        };
+
+        // Verification
+        Object.entries(this.elements).forEach(([key, el]) => {
+            if (!el && key !== 'difficultyBtns') { // difficultyBtns is a NodeList
+                console.warn(`UIManager: Element not found -> ${key}`);
+            }
+        });
     },
 
     getDiceSVG(valor) {
