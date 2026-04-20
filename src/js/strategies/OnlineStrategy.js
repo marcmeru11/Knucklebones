@@ -25,7 +25,7 @@ export class OnlineStrategy extends GameStrategy {
     async roll() {
         if (this.ui.elements.rollBtn.disabled) return;
         
-        this.ui.playRollAnimation(async () => {
+        this.emit('requestRollAnimation', async () => {
             const valorDado = Math.floor(Math.random() * 6) + 1;
             await redFirebase.enviarDado(valorDado);
         });
@@ -35,22 +35,11 @@ export class OnlineStrategy extends GameStrategy {
         const diceValue = this.game.dadoActual;
         const res = this.game.colocarDado(colIndex, true);
         if (res && res.success) {
-            if (res.destroyedCount > 0) {
-                await this.ui.animateElimination(colIndex, true, diceValue);
-            }
-            if (res.destroyedCount === 3) this.ui.shakeScreen();
+            this.emit('dicePlaced', { colIndex, esJugador: true, diceValue, res });
             
             const nuevoTurno = this.miRol === 'jugador1' ? 'jugador2' : 'jugador1';
             await redFirebase.enviarMovimiento(this.game.tableroJugador, this.game.tableroOponente, nuevoTurno);
         }
-    }
-
-    async restart() {
-        await redFirebase.reiniciarSala();
-    }
-
-    async leave() {
-        await redFirebase.abandonarSala();
     }
 
     handleServerUpdate(dataSala, miRol) {
@@ -80,26 +69,27 @@ export class OnlineStrategy extends GameStrategy {
         if (miRol === 'jugador1') {
             newTablero1 = parseArrayFB(estado.tablero1);
             newTablero2 = parseArrayFB(estado.tablero2);
-            this.ui.elements.opponentNameDisplay.textContent = dataSala.jugador2 ? dataSala.jugador2.nombre : t('waitingRival');
+            const name = dataSala.jugador2 ? dataSala.jugador2.nombre : t('waitingRival');
+            this.emit('gameStart', { p1Name: dataSala.jugador1.nombre, p2Name: name });
         } else {
             newTablero1 = parseArrayFB(estado.tablero2);
             newTablero2 = parseArrayFB(estado.tablero1);
-            this.ui.elements.opponentNameDisplay.textContent = dataSala.jugador1 ? dataSala.jugador1.nombre : t('host');
+            const name = dataSala.jugador1 ? dataSala.jugador1.nombre : t('host');
+            this.emit('gameStart', { p1Name: dataSala.jugador2.nombre, p2Name: name });
         }
 
-        // Detect massive elimination from server update (for the passive player)
+        // Detect massive elimination
         let massiveElimination = false;
         for (let i = 0; i < 3; i++) {
             const diff1 = (oldTablero1[i]?.length || 0) - (newTablero1[i]?.length || 0);
             const diff2 = (oldTablero2[i]?.length || 0) - (newTablero2[i]?.length || 0);
             if (diff1 >= 3 || diff2 >= 3) massiveElimination = true;
         }
-        if (massiveElimination) this.ui.shakeScreen();
+        if (massiveElimination) this.emit('shakeRequest', null);
 
-        // Identify last move to highlight it (only if it's NOT our turn, i.e., opponent just played)
+        // Identify last move
         let lastMove = null;
         if (turnoActual === miRol) {
-            // It's our turn now, so the last move was by the opponent
             for (let i = 0; i < 3; i++) {
                 if (newTablero2[i].length > (oldTablero2[i]?.length || 0)) {
                     lastMove = { colIndex: i, esJugador: false };
@@ -111,19 +101,21 @@ export class OnlineStrategy extends GameStrategy {
         this.game.tableroJugador = newTablero1;
         this.game.tableroOponente = newTablero2;
 
-        this.ui.renderTableros(this.game, lastMove);
-        this.ui.actualizarPuntos(this.game);
-        this.ui.actualizarIndicadorTurno(dataSala, miRol);
+        this.emit('stateUpdated', {
+            game: this.game,
+            turnoActual: turnoActual,
+            miRol: miRol,
+            lastMove: lastMove,
+            dataSala: dataSala
+        });
 
-        const faltaRival = !dataSala.jugador1 || !dataSala.jugador2;
-        this.ui.actualizarEstadoDados(this.game.dadoActual, turnoActual, miRol, faltaRival);
-
-        if (this.checkGameOver() && this.ui.elements.modalOverlay.classList.contains('hidden')) {
-            const pJugador = parseInt(this.ui.elements.playerTotalScore.textContent);
-            const pOponente = parseInt(this.ui.elements.opponentTotalScore.textContent);
-            this.ui.mostrarModalFinal(pJugador, pOponente);
+        if (this.checkGameOver()) {
+            const p1Score = this.game.calcularPuntosColumna(this.game.tableroJugador[0]) + this.game.calcularPuntosColumna(this.game.tableroJugador[1]) + this.game.calcularPuntosColumna(this.game.tableroJugador[2]);
+            const p2Score = this.game.calcularPuntosColumna(this.game.tableroOponente[0]) + this.game.calcularPuntosColumna(this.game.tableroOponente[1]) + this.game.calcularPuntosColumna(this.game.tableroOponente[2]);
+            this.emit('gameOver', { p1Score, p2Score });
         }
     }
+
 }
 
 

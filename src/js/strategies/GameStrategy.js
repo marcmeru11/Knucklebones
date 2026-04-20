@@ -1,12 +1,16 @@
+import { EventEmitter } from '../EventEmitter.js?v=5';
+
 /**
  * GameStrategy.js
  * Base class for all game mode strategies.
  */
-export class GameStrategy {
+export class GameStrategy extends EventEmitter {
     constructor(game, uiManager) {
+        super();
         this.game = game;
         this.ui = uiManager;
     }
+
 
     /**
      * Called when the mode starts.

@@ -22,23 +22,33 @@ export class LocalStrategy extends GameStrategy {
         this.game.tableroOponente = [[], [], []];
         this.game.dadoActual = 0;
 
-        this.ui.elements.playerNameDisplay.textContent = t('you');
-        this.ui.elements.opponentNameDisplay.textContent = `CPU (${t(this.difficulty)})`;
+        this.emit('gameStart', {
+            p1Name: t('you'),
+            p2Name: `CPU (${t(this.difficulty)})`
+        });
         
-        this.ui.renderTableros(this.game);
-        this.ui.actualizarPuntos(this.game);
-        this.ui.actualizarEstadoDados(0, this.turnoActual, 'jugador1', false);
-        this.ui.actualizarIndicadorTurno(null, 'jugador1', true);
-        
+        this.sync();
         ScreenManager.showScreen('game-wrapper');
+    }
+
+    sync() {
+        this.emit('stateUpdated', {
+            game: this.game,
+            turnoActual: this.turnoActual,
+            miRol: 'jugador1'
+        });
     }
 
     async roll() {
         if (this.turnoActual !== 'jugador1' || this.game.dadoActual !== 0) return;
         
-        this.ui.playRollAnimation(() => {
+        this.emit('diceRollStart', null);
+        
+        // Wait for potential UI animation if needed, or handle it via mediator
+        // To be agile, we handle the callback in the mediator
+        this.emit('requestRollAnimation', (finalValue) => {
             this.game.dadoActual = Math.floor(Math.random() * 6) + 1;
-            this.ui.actualizarEstadoDados(this.game.dadoActual, this.turnoActual, 'jugador1', false);
+            this.sync();
         });
     }
 
@@ -47,17 +57,12 @@ export class LocalStrategy extends GameStrategy {
 
         const diceValue = this.game.dadoActual;
         const res = this.game.colocarDado(colIndex, true);
+        
         if (res && res.success) {
-            if (res.destroyedCount > 0) {
-                await this.ui.animateElimination(colIndex, true, diceValue);
-            }
-            if (res.destroyedCount === 3) this.ui.shakeScreen();
+            this.emit('dicePlaced', { colIndex, esJugador: true, diceValue, res });
             
             this.turnoActual = 'jugador2';
-            this.ui.renderTableros(this.game, { colIndex, esJugador: true });
-            this.ui.actualizarPuntos(this.game);
-            this.ui.actualizarEstadoDados(0, this.turnoActual, 'jugador1', false);
-            this.ui.actualizarIndicadorTurno(null, 'jugador1', true);
+            this.sync();
             
             if (this.checkGameOver()) {
                 this.finalizarPartida();
@@ -68,49 +73,38 @@ export class LocalStrategy extends GameStrategy {
     }
 
     async ejecutarTurnoIA() {
-        this.ui.actualizarIndicadorTurno(null, 'jugador2', true, true);
+        this.emit('turnChanged', { turn: 'jugador2', isCpuThinking: true });
         await new Promise(resolve => setTimeout(resolve, 600));
         
-        // IA Rolls with animation
-        await new Promise(resolve => {
-            this.ui.playRollAnimation(() => {
-                this.game.dadoActual = Math.floor(Math.random() * 6) + 1;
-                this.ui.actualizarEstadoDados(this.game.dadoActual, 'jugador2', 'jugador1', false);
-                resolve();
-            });
+        this.emit('requestRollAnimation', () => {
+            this.game.dadoActual = Math.floor(Math.random() * 6) + 1;
+            this.sync();
+            
+            setTimeout(async () => {
+                const colIdx = this.ai.suggestMove(this.game.tableroJugador, this.game.tableroOponente, this.game.dadoActual, this.difficulty);
+                const diceValueIA = this.game.dadoActual;
+                const resIA = this.game.colocarDado(colIdx, false);
+                
+                if (resIA && resIA.success) {
+                    this.emit('dicePlaced', { colIndex: colIdx, esJugador: false, diceValue: diceValueIA, res: resIA });
+                    this.turnoActual = 'jugador1';
+                    this.sync();
+                    
+                    if (this.checkGameOver()) {
+                        this.finalizarPartida();
+                    }
+                }
+            }, 800);
         });
-        
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        const colIdx = this.ai.suggestMove(this.game.tableroJugador, this.game.tableroOponente, this.game.dadoActual, this.difficulty);
-        const diceValueIA = this.game.dadoActual;
-        const resIA = this.game.colocarDado(colIdx, false);
-        
-        if (resIA && resIA.success) {
-            if (resIA.destroyedCount > 0) {
-                await this.ui.animateElimination(colIdx, false, diceValueIA);
-            }
-            if (resIA.destroyedCount === 3) this.ui.shakeScreen();
-
-            this.turnoActual = 'jugador1';
-            this.ui.renderTableros(this.game, { colIndex: colIdx, esJugador: false });
-            this.ui.actualizarPuntos(this.game);
-            this.ui.actualizarEstadoDados(0, this.turnoActual, 'jugador1', false);
-            this.ui.actualizarIndicadorTurno(null, 'jugador1', true);
-        }
-
-
-        
-        if (this.checkGameOver()) {
-            this.finalizarPartida();
-        }
     }
 
     finalizarPartida() {
-        const pJugador = parseInt(this.ui.elements.playerTotalScore.textContent);
-        const pOponente = parseInt(this.ui.elements.opponentTotalScore.textContent);
-        this.ui.mostrarModalFinal(pJugador, pOponente);
+        this.emit('gameOver', {
+            p1Score: this.game.calcularPuntosColumna(this.game.tableroJugador[0]) + this.game.calcularPuntosColumna(this.game.tableroJugador[1]) + this.game.calcularPuntosColumna(this.game.tableroJugador[2]),
+            p2Score: this.game.calcularPuntosColumna(this.game.tableroOponente[0]) + this.game.calcularPuntosColumna(this.game.tableroOponente[1]) + this.game.calcularPuntosColumna(this.game.tableroOponente[2])
+        });
     }
+
 
     async restart() {
         this.init({ difficulty: this.difficulty });

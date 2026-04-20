@@ -95,6 +95,73 @@ elements.logoutBtn.addEventListener('click', async () => {
     }
 });
 
+// --- MEDIATOR / EVENT HANDLERS ---
+function setupStrategyListeners(strategy) {
+    if (!strategy) return;
+
+    strategy.on('gameStart', (data) => {
+        elements.playerNameDisplay.textContent = data.p1Name;
+        elements.opponentNameDisplay.textContent = data.p2Name;
+    });
+
+    strategy.on('stateUpdated', (data) => {
+        UIManager.renderTableros(data.game, data.lastMove);
+        UIManager.actualizarPuntos(data.game);
+        
+        const faltaRival = data.dataSala ? (!data.dataSala.jugador1 || !data.dataSala.jugador2) : false;
+        UIManager.actualizarEstadoDados(data.game.dadoActual, data.turnoActual, data.miRol, faltaRival);
+        
+        if (data.dataSala) {
+            UIManager.actualizarIndicadorTurno(data.dataSala, data.miRol);
+        }
+    });
+
+    strategy.on('turnChanged', (data) => {
+        UIManager.actualizarIndicadorTurno(null, data.turn, true, data.isCpuThinking, data.isPvpLocal);
+    });
+
+    strategy.on('diceRollStart', () => {
+        // Optional: show immediate UI feedback before animation
+    });
+
+    strategy.on('requestRollAnimation', (callback) => {
+        UIManager.playRollAnimation(callback);
+    });
+
+    strategy.on('dicePlaced', async (data) => {
+        if (data.res.destroyedCount > 0) {
+            await UIManager.animateElimination(data.colIndex, data.esJugador, data.diceValue);
+        }
+        if (data.res.destroyedCount === 3) {
+            UIManager.shakeScreen();
+        }
+    });
+
+    strategy.on('shakeRequest', () => {
+        UIManager.shakeScreen();
+    });
+
+    strategy.on('gameOver', (data) => {
+        if (data.isPvpLocal) {
+            UIManager.elements.winnerTitle.className = 'winner-title';
+            if (data.p1Score > data.p2Score) {
+                UIManager.elements.winnerTitle.textContent = `${t('player1')} ${t('victory')}`;
+                UIManager.elements.winnerTitle.classList.add('win');
+            } else if (data.p2Score > data.p1Score) {
+                UIManager.elements.winnerTitle.textContent = `${t('player2')} ${t('victory')}`;
+                UIManager.elements.winnerTitle.classList.add('lose');
+            } else {
+                UIManager.elements.winnerTitle.textContent = t('tie');
+                UIManager.elements.winnerTitle.classList.add('tie');
+            }
+            UIManager.elements.winnerScoreText.textContent = `${data.p1Score} - ${data.p2Score}`;
+            UIManager.elements.modalOverlay.classList.remove('hidden');
+        } else {
+            UIManager.mostrarModalFinal(data.p1Score, data.p2Score);
+        }
+    });
+}
+
 // --- LOBBY & MODOS ---
 elements.createRoomBtn.addEventListener('click', async () => {
     try {
@@ -106,6 +173,7 @@ elements.createRoomBtn.addEventListener('click', async () => {
         elements.createRoomBtn.innerHTML = `<span class="roll-btn-text">${t('createRoom')}</span><span class="roll-btn-shine"></span>`;
         
         currentStrategy = new OnlineStrategy(game, UIManager);
+        setupStrategyListeners(currentStrategy);
         await currentStrategy.init();
     } catch (error) {
         elements.createRoomBtn.innerHTML = `<span class="roll-btn-text">${t('createRoom')}</span><span class="roll-btn-shine"></span>`;
@@ -123,6 +191,7 @@ elements.joinRoomBtn.addEventListener('click', async () => {
         elements.joinRoomBtn.innerHTML = `<span class="roll-btn-text">${t('joinRoom')}</span><span class="roll-btn-shine"></span>`;
         
         currentStrategy = new OnlineStrategy(game, UIManager);
+        setupStrategyListeners(currentStrategy);
         await currentStrategy.init();
     } catch (error) {
         elements.joinRoomBtn.innerHTML = `<span class="roll-btn-text">${t('joinRoom')}</span><span class="roll-btn-shine"></span>`;
@@ -140,14 +209,16 @@ elements.difficultyBtns.forEach(btn => {
 
 elements.startSinglePlayerBtn.addEventListener('click', async () => {
     currentStrategy = new LocalStrategy(game, UIManager, ai);
+    setupStrategyListeners(currentStrategy);
     await currentStrategy.init({ difficulty: aiDifficulty });
 });
 
 elements.modeLocalPvpBtn.addEventListener('click', async () => {
-    console.log("Local PVP button clicked!");
     currentStrategy = new LocalPvpStrategy(game, UIManager);
+    setupStrategyListeners(currentStrategy);
     await currentStrategy.init({});
 });
+
 
 elements.modeOnlineBtn.addEventListener('click', () => {
     ScreenManager.showScreen('lobby-overlay');

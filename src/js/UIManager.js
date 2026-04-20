@@ -276,16 +276,18 @@ export const UIManager = {
         currentDieContainer.classList.add('rolling');
         
         let count = 0;
+        const totalTicks = 5; // Reduced for agility
         const interval = setInterval(() => {
             const randomVal = Math.floor(Math.random() * 6) + 1;
             dieValueSpan.innerHTML = this.getDiceSVG(randomVal);
             count++;
-            if (count > 8) {
+            if (count >= totalTicks) {
                 clearInterval(interval);
                 callback();
             }
-        }, 50).unref?.() || null; // fallback for non-node environments though setInterval returns id
+        }, 50);
     },
+
 
     async animateElimination(colIndex, esJugadorAtacante, numDado) {
         // esJugadorAtacante true -> ataca al oponente (tableroOponente)
