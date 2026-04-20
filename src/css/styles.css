@@ -412,18 +412,22 @@ body {
   outline: none;
   border-radius: var(--radius-md);
   width: 100%;
-  padding: clamp(8px, 1.5vh, 13px) 6px;
+  padding: clamp(10px, 1.8vh, 15px) 12px;
   background: linear-gradient(135deg, #c8973a 0%, #a07020 100%);
   color: #0d0d12;
   font-family: var(--font-title);
-  font-size: clamp(0.7rem, 1.6vh, 0.88rem);
+  font-size: clamp(0.75rem, 1.6vh, 0.9rem);
   font-weight: 700;
   letter-spacing: 0.05em;
-  box-shadow: 0 4px 16px rgba(200,151,58,0.4), 0 2px 4px rgba(0,0,0,0.5);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.5);
   transition:
     transform  var(--transition-fast),
     box-shadow var(--transition-normal),
     filter     var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
 .roll-btn:hover:not(:disabled) {
