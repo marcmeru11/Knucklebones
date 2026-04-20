@@ -11,6 +11,7 @@ const translations = {
         selectMode: "Select Game Mode",
         onlineMode: "Online Multiplayer",
         cpuMode: "Player vs CPU",
+        localPvpMode: "Local 2 Players",
         back: "Back",
         multiplayer: "Multiplayer",
         roomSub: "Enter a code to create a room or join a friend's room.",
@@ -50,7 +51,9 @@ const translations = {
         hard: "Hard",
         startSinglePlayerByDiff: "Level: ",
         cpuThinking: "CPU is thinking...",
-        cpuTurn: "Turn: CPU"
+        cpuTurn: "Turn: CPU",
+        player1: "Player 1",
+        player2: "Player 2"
     },
     es: {
         pageTitle: "Matatena",
@@ -64,6 +67,7 @@ const translations = {
         selectMode: "Seleccionar Modo",
         onlineMode: "Multijugador Online",
         cpuMode: "Jugador vs CPU",
+        localPvpMode: "2 Jugadores Local",
         back: "Volver",
         multiplayer: "Multijugador",
         roomSub: "Escribe un código para crear una sala o unirte a la de un amigo.",
@@ -103,7 +107,9 @@ const translations = {
         hard: "Difícil",
         startSinglePlayerByDiff: "Nivel: ",
         cpuThinking: "La CPU está pensando...",
-        cpuTurn: "Turno: CPU"
+        cpuTurn: "Turno: CPU",
+        player1: "Jugador 1",
+        player2: "Jugador 2"
     }
 };
 

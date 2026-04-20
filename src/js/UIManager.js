@@ -42,6 +42,7 @@ export const UIManager = {
             modeSelectionOverlay: document.getElementById('mode-selection-overlay'),
             modeOnlineBtn: document.getElementById('mode-online-btn'),
             modeCpuBtn: document.getElementById('mode-cpu-btn'),
+            modeLocalPvpBtn: document.getElementById('mode-pvp-local-btn'),
             aiOverlay: document.getElementById('ai-overlay'),
             lobbyBackBtn: document.getElementById('lobby-back-btn'),
             aiBackBtn: document.getElementById('ai-back-btn')

@@ -4,6 +4,7 @@ import { UIManager } from './UIManager.js?v=4';
 import { ScreenManager } from './ScreenManager.js?v=4';
 import { LocalStrategy } from './strategies/LocalStrategy.js?v=4';
 import { OnlineStrategy } from './strategies/OnlineStrategy.js?v=4';
+import { LocalPvpStrategy } from './strategies/LocalPvpStrategy.js?v=4';
 
 UIManager.init();
 
@@ -140,6 +141,11 @@ elements.difficultyBtns.forEach(btn => {
 elements.startSinglePlayerBtn.addEventListener('click', async () => {
     currentStrategy = new LocalStrategy(game, UIManager, ai);
     await currentStrategy.init({ difficulty: aiDifficulty });
+});
+
+elements.modeLocalPvpBtn.addEventListener('click', async () => {
+    currentStrategy = new LocalPvpStrategy(game, UIManager);
+    await currentStrategy.init({});
 });
 
 elements.modeOnlineBtn.addEventListener('click', () => {
