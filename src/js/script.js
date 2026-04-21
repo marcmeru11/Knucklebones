@@ -68,6 +68,10 @@ elements.restartBtn.addEventListener('click', async () => {
     if (currentStrategy) await currentStrategy.restart();
 });
 
+elements.gameOverLeaveBtn.addEventListener('click', async () => {
+    await salirAlLobby();
+});
+
 // --- AUTH ---
 elements.loginGithubBtn.addEventListener('click', async () => {
     try {

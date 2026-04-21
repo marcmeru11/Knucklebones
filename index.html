@@ -243,10 +243,13 @@
     <div class="modal-content">
       <h2 id="winner-title" class="winner-title" data-i18n="victory">Victory!</h2>
       <p id="winner-score" class="winner-score">0 a 0</p>
-      <button id="restart-btn" class="roll-btn restart-btn">
-        <span class="roll-btn-text" data-i18n="playAgain">Play Again</span>
-        <span class="roll-btn-shine"></span>
-      </button>
+      <div style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+        <button id="restart-btn" class="roll-btn restart-btn">
+          <span class="roll-btn-text" data-i18n="playAgain">Play Again</span>
+          <span class="roll-btn-shine"></span>
+        </button>
+        <button id="game-over-leave-btn" class="logout-btn" style="width: 100%; font-size: 0.9rem; padding: 12px 30px;" data-i18n="leaveRoom">Leave Match</button>
+      </div>
     </div>
   </div>
 

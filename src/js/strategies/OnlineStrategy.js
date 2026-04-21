@@ -42,6 +42,14 @@ export class OnlineStrategy extends GameStrategy {
         }
     }
 
+    async restart() {
+        await redFirebase.reiniciarSala();
+    }
+
+    async leave() {
+        await redFirebase.abandonarSala();
+    }
+
     handleServerUpdate(dataSala, miRol) {
         if (!dataSala) {
             alert(t('roomClosedMessage'));
@@ -113,9 +121,12 @@ export class OnlineStrategy extends GameStrategy {
             const p1Score = this.game.calcularPuntosColumna(this.game.tableroJugador[0]) + this.game.calcularPuntosColumna(this.game.tableroJugador[1]) + this.game.calcularPuntosColumna(this.game.tableroJugador[2]);
             const p2Score = this.game.calcularPuntosColumna(this.game.tableroOponente[0]) + this.game.calcularPuntosColumna(this.game.tableroOponente[1]) + this.game.calcularPuntosColumna(this.game.tableroOponente[2]);
             this.emit('gameOver', { p1Score, p2Score });
+        } else {
+            // Si la partida no ha terminado, asegúrate de ocultar cualquier modal (como el de Game Over)
+            // Esto permite que el reinicio de la sala se refleje en ambos jugadores
+            ScreenManager.showScreen('game-wrapper');
         }
     }
-
 }
 
 

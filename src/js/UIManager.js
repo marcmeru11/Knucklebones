@@ -21,6 +21,7 @@ export const UIManager = {
             winnerTitle: document.getElementById('winner-title'),
             winnerScoreText: document.getElementById('winner-score'),
             restartBtn: document.getElementById('restart-btn'),
+            gameOverLeaveBtn: document.getElementById('game-over-leave-btn'),
             loginOverlay: document.getElementById('login-overlay'),
             loginGithubBtn: document.getElementById('login-github-btn'),
             loginGoogleBtn: document.getElementById('login-google-btn'),
