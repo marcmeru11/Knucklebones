@@ -86,12 +86,16 @@ export class OnlineStrategy extends GameStrategy {
             this.emit('gameStart', { p1Name: dataSala.jugador2.nombre, p2Name: name });
         }
 
-        // Detect massive elimination
+        // Detect massive elimination (only if not a reset)
+        const isReset = newTablero1.every(col => col.length === 0) && newTablero2.every(col => col.length === 0);
         let massiveElimination = false;
-        for (let i = 0; i < 3; i++) {
-            const diff1 = (oldTablero1[i]?.length || 0) - (newTablero1[i]?.length || 0);
-            const diff2 = (oldTablero2[i]?.length || 0) - (newTablero2[i]?.length || 0);
-            if (diff1 >= 3 || diff2 >= 3) massiveElimination = true;
+        
+        if (!isReset) {
+            for (let i = 0; i < 3; i++) {
+                const diff1 = (oldTablero1[i]?.length || 0) - (newTablero1[i]?.length || 0);
+                const diff2 = (oldTablero2[i]?.length || 0) - (newTablero2[i]?.length || 0);
+                if (diff1 >= 3 || diff2 >= 3) massiveElimination = true;
+            }
         }
         if (massiveElimination) this.emit('shakeRequest', null);
 
