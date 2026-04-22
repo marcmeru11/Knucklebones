@@ -1,10 +1,12 @@
-import { redFirebase } from './FirebaseService.js?v=5';
-import { setLanguage, t } from './i18n.js?v=5';
-import { UIManager } from './UIManager.js?v=5';
-import { ScreenManager } from './ScreenManager.js?v=5';
+import { redFirebase } from './services/FirebaseService.js?v=5';
+import { setLanguage, t } from './utils/i18n.js?v=5';
+import { UIManager } from './ui/UIManager.js?v=5';
+import { ScreenManager } from './ui/ScreenManager.js?v=5';
 import { LocalStrategy } from './strategies/LocalStrategy.js?v=5';
 import { OnlineStrategy } from './strategies/OnlineStrategy.js?v=5';
 import { LocalPvpStrategy } from './strategies/LocalPvpStrategy.js?v=5';
+import { MatatenaLogic } from './models/MatatenaLogic.js?v=5';
+import { MatatenaAI } from './models/MatatenaAI.js?v=5';
 
 UIManager.init();
 

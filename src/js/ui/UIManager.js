@@ -1,4 +1,4 @@
-import { t } from './i18n.js?v=5';
+import { t } from '../utils/i18n.js?v=5';
 import { ScreenManager } from './ScreenManager.js?v=5';
 
 export const UIManager = {

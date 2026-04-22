@@ -2,7 +2,7 @@
  * MatatenaAI.js
  * Logic for the computer opponent in Single Player mode.
  */
-class MatatenaAI {
+export class MatatenaAI {
     constructor() {
         this.difficulties = ['easy', 'medium', 'hard'];
     }

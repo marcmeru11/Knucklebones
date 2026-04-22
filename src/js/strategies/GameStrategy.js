@@ -1,4 +1,4 @@
-import { EventEmitter } from '../EventEmitter.js?v=5';
+import { EventEmitter } from '../utils/EventEmitter.js?v=5';
 
 /**
  * GameStrategy.js

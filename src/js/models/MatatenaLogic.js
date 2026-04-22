@@ -1,4 +1,4 @@
-class MatatenaLogic {
+export class MatatenaLogic {
     constructor() {
         this.tableroJugador = [[], [], []];
         this.tableroOponente = [[], [], []];

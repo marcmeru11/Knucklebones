@@ -35,4 +35,7 @@ logs
 firebase-debug.log
 
 # Firebase Config
-src/js/firebase-config.js
+src/js/services/firebase-config.js
+
+# Coverage reports
+coverage/
